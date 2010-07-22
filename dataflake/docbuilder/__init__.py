@@ -23,50 +23,46 @@ import sys
 import urlparse
 
 OPTIONS = (
-  optparse.make_option( '-o'
-                      , '--output'
-                      , action='store'
-                      , dest='output'
-                      , help='target directory where packages are checked out'
-                      ),
-  optparse.make_option( '-u'
-                      , '--url'
+  optparse.make_option( '-s'
+                      , '--source'
                       , action='append'
                       , dest='urls'
                       , help='SVN URL (can be used multiple times)'
                       ),
-  optparse.make_option( '-f'
-                      , '--docs-folder'
-                      , action='append'
-                      , dest='docs_folders'
-                      , help='Sphinx documentation folder name (can be used multiple times, default: "doc" and "docs")'
-                      , default=('doc', 'docs')
-                      ),
-  optparse.make_option( '-b'
-                      , '--build-folder'
+  optparse.make_option( '-w'
+                      , '--working-directory'
                       , action='store'
-                      , dest='build_folder'
-                      , help='Sphinx build folder name (default: "_auto_build")'
-                      , default='_auto_build'
+                      , dest='workingdir'
+                      , help='working directory for package checkouts'
                       ),
-  optparse.make_option( '-s'
+  optparse.make_option( '-o'
+                      , '--output-directory'
+                      , action='store'
+                      , dest='htmldir'
+                      , help='Root folder for HTML output (default: $working-directory/html)'
+                      ),
+  optparse.make_option( '-t'
                       , '--trunk-only'
                       , action='store_true'
                       , dest='trunk_only'
-                      , help='Only build trunk documentation?'
+                      , help='Only build trunk documentation? (default: False)'
                       , default=False
                       ),
-  optparse.make_option( '-d'
-                      , '--trunk'
+  optparse.make_option( '--docs-directory'
+                      , action='append'
+                      , dest='docs_folders'
+                      , help='Sphinx documentation folder name (can be used multiple times, default: "doc" and "docs")'
+                      , default=['doc', 'docs']
+                      ),
+  optparse.make_option( '--trunk-directory'
                       , action='store'
-                      , dest='trunk'
+                      , dest='trunk_name'
                       , help='Development trunk container name (default: "trunk")'
                       , default='trunk'
                       ),
-  optparse.make_option( '-t'
-                      , '--tags'
+  optparse.make_option( '--tags-directory'
                       , action='store'
-                      , dest='tags'
+                      , dest='tags_name'
                       , help='Development tags container name (default: "tags")'
                       , default='tags'
                       ),
@@ -82,18 +78,22 @@ class DocsBuilder(object):
         if not self.options.urls:
             parser.error('Please provide package SVN URLs')
 
-        if not self.options.output:
-            parser.error('Please provide an output directory path')
+        if not self.options.workingdir:
+            parser.error('Please provide an workingdir directory path')
 
-        if not os.path.isdir(self.options.output):
-            parser.error('Output folder %s does not exist.' % self.options.output)
+        if not os.path.isdir(self.options.workingdir):
+            msg = 'Output folder %s does not exist.' % self.options.workingdir
+            parser.error(msg)
 
-        self.html_path = os.path.join(self.options.output, 'html')
+        if not self.options.htmldir:
+            self.options.htmldir = os.path.join(self.options.workingdir, 'html')
+            if not os.path.isdir(self.options.htmldir):
+                os.mkdir(self.options.htmldir)
+        elif not os.path.isdir(self.options.htmldir):
+            msg = 'HTML output folder %s does not exist.' % self.options.htmldir
+            parser.error(msg)
 
     def run(self):
-        if not os.path.isdir(self.html_path):
-            os.mkdir(self.html_path)
-
         for url in self.options.urls:
             package_name, tag_names = self.checkout_or_update(url)
             tag_data = self.build_html(package_name, tag_names)
@@ -119,19 +119,19 @@ class DocsBuilder(object):
     def create_main_index(self):
         tags_list = []
         
-        for name in os.listdir(self.html_path):
-            path = os.path.join(self.html_path, name)
+        for name in os.listdir(self.options.htmldir):
+            path = os.path.join(self.options.htmldir, name)
             if os.path.isdir(path) or os.path.islink(path):
                 tags_list.append(LINK_HTML % {'name': name})
 
-        index_file = open(os.path.join(self.html_path, 'index.html'), 'w')
+        index_file = open(os.path.join(self.options.htmldir, 'index.html'), 'w')
         index_file.write( INDEX_HTML % { 'name': ''
                                        , 'tags_text': '\n'.join(tags_list)
                                        } )
         index_file.close()
 
     def create_index_html(self, package_name, tag_names):
-        html_root_path = os.path.join(self.html_path, package_name)
+        html_root_path = os.path.join(self.options.htmldir, package_name)
         if not os.path.isdir(html_root_path):
             os.mkdir(html_root_path)
         tags_list = []
@@ -155,7 +155,7 @@ class DocsBuilder(object):
             tag_names.append('trunk')
         tag_data = {}.fromkeys(tag_names)
 
-        package_path = os.path.join(self.options.output, package_name)
+        package_path = os.path.join(self.options.workingdir, package_name)
 
         for tag in tag_names:
             tag_folder = os.path.join(package_path, tag)
@@ -169,7 +169,7 @@ class DocsBuilder(object):
             if not doc_folder:
                 continue
 
-            build_folder = os.path.join(doc_folder, self.options.build_folder)
+            build_folder = os.path.join(doc_folder, '.build')
             shutil.rmtree(build_folder, ignore_errors=True)
             os.mkdir(build_folder)
             html_output_folder = os.path.join(build_folder, 'html')
@@ -209,7 +209,7 @@ class DocsBuilder(object):
         if not html_output_folder:
             return
 
-        html_root_path = os.path.join(self.html_path, package_name)
+        html_root_path = os.path.join(self.options.htmldir, package_name)
 
         if not self.options.trunk_only:
             if not os.path.isdir(html_root_path):
@@ -229,18 +229,18 @@ class DocsBuilder(object):
     def checkout_or_update(self, package_url):
         parsed_url = list(urlparse.urlparse(package_url))
         package_name = [x for x in parsed_url[2].split('/') if x][-1]
-        package_dir = os.path.join(self.options.output, package_name)
+        package_dir = os.path.join(self.options.workingdir, package_name)
         pythonpath = ':'.join(sys.path)
 
         if not os.path.isdir(package_dir):
             os.mkdir(package_dir)
 
-        trunk_path = os.path.join(package_dir, self.options.trunk)
+        trunk_path = os.path.join(package_dir, self.options.trunk_name)
         if os.path.isdir(trunk_path):
             self._do_shell_command('svn up %s' % trunk_path)
         else:
             url_elements = parsed_url[:]
-            url_elements[2] = os.path.join(parsed_url[2], self.options.trunk)
+            url_elements[2] = os.path.join(parsed_url[2], self.options.trunk_name)
             cmd = 'svn co %s %s' % (urlparse.urlunparse(url_elements), trunk_path)
             self._do_shell_command(cmd)
         cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
@@ -250,7 +250,7 @@ class DocsBuilder(object):
         if self.options.trunk_only:
             return (package_name, [])
 
-        cmd = 'svn ls %s/%s' % (package_url, self.options.tags)
+        cmd = 'svn ls %s/%s' % (package_url, self.options.tags_name)
         tag_names = [x.replace('/', '') for x in 
                                 self._do_shell_command(cmd).split()]
         tag_names.sort()
@@ -260,7 +260,7 @@ class DocsBuilder(object):
             if not os.path.isdir(tag_path):
                 # We only check out; tags presumably do not change!
                 cmd = 'svn co %s/%s/%s %s' % (
-                        package_url, self.options.tags, tag, tag_path)
+                        package_url, self.options.tags_name, tag, tag_path)
                 self._do_shell_command(cmd)
             cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
                        pythonpath, sys.executable, tag_path)
@@ -294,21 +294,24 @@ class BuildoutScript:
         import zc.buildout
         import zc.recipe.egg
 
-        if not options.get('sources'):
-            raise zc.buildout.UserError('Missing parameter: sources (SVN URLs).')
+        script_name = options.get('script', name)
 
-        if not options.get('output'):
+        if not options.get('source'):
+            raise zc.buildout.UserError('Missing parameter: source (SVN URLs).')
+
+        if not options.get('working-directory'):
             parts = buildout['buildout']['parts-directory']
-            options['output'] = os.path.join(parts, options.get('script',name))
-            if not os.path.isdir(options['output']):
-                os.mkdir(options['output'])
+            options['working-directory'] = os.path.join(parts, script_name)
+            if not os.path.isdir(options['working-directory']):
+                os.mkdir(options['working-directory'])
         else:
-            if not os.path.isdir(options['output']):
-                msg = 'Output folder "%s" does not exist!' % options['output']
+            if not os.path.isdir(options['working-directory']):
+                msg = 'Working directory "%s" does not exist!' % (
+                                                    options['working-directory'])
                 raise zc.buildout.UserError(msg)
 
         options['script'] = os.path.join( buildout['buildout']['bin-directory']
-                                        , options.get('script', name)
+                                        , script_name
                                         )
         python = options.get('python', buildout['buildout']['python'])
         options['executable'] = buildout[python]['executable']
@@ -317,7 +320,6 @@ class BuildoutScript:
         self.buildout = buildout
         self.name = name
         self.options = options
-
         self.egg = zc.recipe.egg.Egg(self.buildout, self.name, self.options)
 
     def install(self):
@@ -326,10 +328,26 @@ class BuildoutScript:
         reqs, ws = self.egg.working_set([self.options['recipe']])
 
         script_args = []
-        script_args.extend(['-o', self.options['output'].strip()])
-        for url in [x.strip() for x in self.options['sources'].split()]:
-            script_args.extend(['-u', url])
-
+        script_args.extend(['-w', self.options['working-directory'].strip()])
+        for url in [x.strip() for x in self.options['source'].split()]:
+            script_args.extend(['-s', url])
+        if self.options.get('html-directory'):
+            script_args.extend(['-o', self.options['html-directory'].strip()])
+        if self.options.get('docs-directory'):
+            df = [x.strip() for x in self.options['docs-directory'].split()]
+            for doc_folder in df:
+                script_args.extend(['--docs-directory', doc_folder])
+        if self.options.get('trunk-directory'):
+            script_args.extend( [ '--trunk-directory'
+                                , self.options['trunk-directory']
+                                ] )
+        if self.options.get('tags-directory'):
+            script_args.extend( [ '--tags-directory'
+                                , self.options['tags-directory']
+                                ] )
+        if self.options.get('trunk-only'):
+            script_args.extend(['-t', self.options['trunk-only']])
+                
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 
         arg = [(self.options['script'], self.options['recipe'], 'run_builder')]

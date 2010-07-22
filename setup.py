@@ -60,6 +60,7 @@ setup(name=NAME,
       install_requires=[
         'setuptools',
         'Sphinx <= 0.99',
+        'pkginfo',
         'zc.recipe.egg',
         ],
       zip_safe=False,
