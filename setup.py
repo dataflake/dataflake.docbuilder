@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2009-2010 Jens Vagelpohl and Contributors. All Rights Reserved.
+# Copyright (c) 2010 Jens Vagelpohl and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-__version__ = '1.3dev'
+__version__ = '1.0dev'
 
 import os
 import sys
@@ -23,6 +23,7 @@ def read(*rnames):
 
 _boundary = '\n' + ('-' * 60) + '\n\n'
 extra = {}
+NAME = 'dataflake.docbuilder'
 
 #if sys.version_info >= (3,):
 #    # Python 3 support:
@@ -31,9 +32,9 @@ extra = {}
 #    extra['use_2to3_fixers'] = ['zope.fixers']
 #    extra['convert_2to3_doctests'] = ['docs/usage.rst']
 
-setup(name='dataflake.docbuilder',
+setup(name=NAME,
       version=__version__,
-      description='Simple caching library',
+      description='Automated Sphix documentation builder',
       long_description=( read('README.txt') 
                        + _boundary 
                        + "Download\n========"
@@ -48,20 +49,25 @@ setup(name='dataflake.docbuilder',
 #        "Programming Language :: Python :: 3.1",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
-      keywords='Sphinx documentation',
+      keywords='sphinx documentation',
       author="Jens Vagelpohl and contributors",
       author_email="jens@dataflake.org",
-      url="http://pypi.python.org/pypi/dataflake.docbuilder",
+      url="http://pypi.python.org/pypi/%s" % NAME,
       license="ZPL 2.1",
       packages=find_packages(),
       include_package_data=True,
       namespace_packages=['dataflake'],
       install_requires=[
         'setuptools',
-        'zope.interface',
+        'Sphinx <= 0.99',
+        'zc.recipe.egg',
         ],
       zip_safe=False,
-      test_suite='dataflake.docbuilder.tests',
+      test_suite='%s.tests' % NAME,
+      entry_points = {
+          'console_scripts': ['docbuilder = %s:run_builder' % NAME],
+          'zc.buildout': ['default=%s:BuildoutScript' % NAME]
+        },
       **extra
       )
 
