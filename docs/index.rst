@@ -5,7 +5,7 @@ Documentation
 =============
 
 :mod:`dataflake.docbuilder` provides a set of scripts to automate 
-building Sprinx-based package documentation for packages hosted on 
+building `Sphinx`-based package documentation for packages hosted on 
 a Subversion revision control server.
 
 Narrative documentation
