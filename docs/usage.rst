@@ -1,42 +1,117 @@
 Using dataflake.docbuilder
 ==========================
 
-:mod:`dataflake.docbuilder` provides several cache implementations 
-with a shared simplified API.
+:mod:`dataflake.docbuilder` can be used in two ways. It defines a 
+:term:`Setuptools` entry point called ``docbuilder``, which automatically 
+creates a shell script ``docbuilder`` when the package is installed 
+through :term:`Setuptools`. If you are using :term:`zc.buildout`, you 
+can use the package directly as a ``recipe`` and configure the 
+documentation builder within your buildout configuration file.
 
-Using a SimpleCache object:
+.. warning::
 
-.. doctest::
+   When the documentation build scripts build the `Sphinx` documentation, 
+   the downloaded packages are not fully installed. They only have 
+   their EGG-INFO structures created and are then added to ``sys.path`` 
+   for the time it takes to run the `Sphinx` builder so they can be 
+   imported. That means their dependencies are not installed 
+   automatically. If there are dependencies that must be available 
+   before the package can be imported or before the `Sphinx` 
+   documentation can be built (such as third-party `Sphinx` extensions) 
+   you must make them available yourself. How to do so is shown below.
 
-    >>> from dataflake.docbuilder.simple import SimpleCache
-    >>> cache = SimpleCache()
-    >>> cache.set('key1', 'value1')
-    >>> cache.get('key1')
-    'value1'
-    >>> cache.invalidate('key1')
-    >>> cache.get('key1', default='not available')
-    'not available'
+From :term:`Setuptools`
+-----------------------
 
-To attach a specific lifetime to cached items, a cache 
-implementation with built-in timeout is provided as well:
+After installing :mod:`dataflake.docbuilder` using :term:`Setuptools`,
+a shell script named ``docbuilder`` is created. This can be used to 
+invoke the documentation build process and accepts several options, 
+which you can discover yourself by running ``docbuilder -h`` or 
+``docbuilder --help``:
 
-.. doctest::
+* ``-s <URLS>`` or ``--source=<URLS>``: This `mandatory` parameter, 
+  which can be given multiple times, contains an URL to a package's 
+  location in a :term:`Subversion` software repository.
 
-    >>> import time
-    >>> from dataflake.docbuilder.timeout import TimeoutCache
-    >>> cache = TimeoutCache()
-    >>> cache.setTimeout(1)
-    >>> cache.set('key1', 'value1')
-    >>> cache.get('key1')
-    'value1'
-    >>> time.sleep(1)
-    >>> cache.get('key1', default='not available')
-    'not available'
+* ``-w <PATH>`` or ``--working-directory=<PATH>``: The ``docbuilder`` 
+  script will check out the packages and run the documentation build 
+  process in this folder. This parameter is `mandatory` as well.
 
-Both the simple and timeout caches are available as thread-safe 
-implementations using locks, see the :ref:`simple_cache_module` 
-and :ref:`timeout_cache_module` documentation.
+* ``-o <PATH>`` or ``--output-directory=<PATH>``: This is where the 
+  folder tree for the HTML output is stored, which links back into 
+  the build tree defined by the ``working-directory`` parameter. If 
+  it is not specified, the HTML output tree will end up in a folder 
+  named `html` inside the ``working-directory``.
 
-The :ref:`api_interfaces_section` page contains more
-information about the cache APIs.
+* ``-t`` or ``--trunk-only``: This flag is unset by default, which 
+  means the documentation is built for the current development trunk 
+  as well as all version tags from the version tags folder for your 
+  package in :term:`Subversion`. If you set this flag only documentation 
+  from the development trunk will be built.
+
+* ``--docs-directory=<NAME>``: The folder name inside your software 
+  package checkout where `Sphinx` documentation is stored. By 
+  default, the folders `doc` and `docs` are searched. You can use this 
+  parameter multiple times to add other folder names to the default list.
+
+* ``--trunk-directory=<NAME>``: The folder name inside your package's 
+  :term:`Subversion` location where the most current development happens.
+  By default a name of `trunk` is used.
+
+* ``--tags-directory=<NAME>``: The folder name inside your package's 
+  :term:`Subversion` location where version tags are stored. By default
+  a name of `tags` is used.
+
+* ``-h`` or ``--help``: Show the help text.
+
+If the package to be documented or its `Sphinx` documentation 
+configuration needs additional packages to be imported and run, you 
+need to make them available yourself by e.g. using ``easy_install``.
+
+From :term:`zc.buildout`
+------------------------
+
+In a :term:`zc.buildout` configuration file, the 
+:mod:`dataflake.docbuilder` package can be used directly as a recipe.
+The recipe will create a shell script that invokes the document 
+build process with the options specified in the configuration stanza.
+Here's a simple example::
+
+  [buildout]
+  parts = docbuilderdocs
+
+  [docbuilderdocs]
+  recipe = dataflake.docbuilder
+  eggs =  
+      repoze.sphinx.autointerface
+  source =
+      http://svn.dataflake.org/svn/dataflake.docbuilder
+
+This configuration will create a script named ``docbuilderdocs`` 
+which builds the `Sphinx` documentation found in the 
+:mod:`dataflake.docbuilder` trunk and all development tags.
+
+The following keywords can be used with this recipe (documentation see
+above):
+
+* ``eggs``: If the package to be documented or its `Sphinx` 
+  documentation configuration needs additional packages to be imported 
+  and run, you need to list them here so they get pulled in 
+  automatically.
+
+* ``source``: the ``--source`` parameter shown above. Mandatory.
+
+* ``working-directory``: the ``--working-directory`` parameter shown above.
+  If none is specified, a default of 
+  ``{buildout:directory}/parts/<SCRIPTNAME>`` is used.
+
+* ``output-directory``: the ``--output-directory`` parameter shown above
+
+* ``trunk-only``: the ``--trunk-only`` parameter shown above
+
+* ``docs-directory``: the ``--docs-directory`` parameter shown above
+
+* ``trunk-directory``: the ``--trunk-directory`` parameter shown above
+
+* ``tags-directory``: the ``--tags-directory`` parameter shown above
 

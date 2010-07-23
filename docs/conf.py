@@ -31,7 +31,6 @@ pkg_info = pkginfo.Develop(parent_dir)
 extensions = [ 'sphinx.ext.autodoc'
              , 'sphinx.ext.doctest'
              , 'sphinx.ext.intersphinx'
-             , 'repoze.sphinx.autointerface'
              ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -331,8 +331,8 @@ class BuildoutScript:
         script_args.extend(['-w', self.options['working-directory'].strip()])
         for url in [x.strip() for x in self.options['source'].split()]:
             script_args.extend(['-s', url])
-        if self.options.get('html-directory'):
-            script_args.extend(['-o', self.options['html-directory'].strip()])
+        if self.options.get('output-directory'):
+            script_args.extend(['-o', self.options['output-directory'].strip()])
         if self.options.get('docs-directory'):
             df = [x.strip() for x in self.options['docs-directory'].split()]
             for doc_folder in df:
