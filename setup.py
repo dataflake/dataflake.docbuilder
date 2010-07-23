@@ -25,13 +25,6 @@ _boundary = '\n' + ('-' * 60) + '\n\n'
 extra = {}
 NAME = 'dataflake.docbuilder'
 
-#if sys.version_info >= (3,):
-#    # Python 3 support:
-#    extra['use_2to3'] = True
-#    extra['setup_requires'] = ['zope.fixers']
-#    extra['use_2to3_fixers'] = ['zope.fixers']
-#    extra['convert_2to3_doctests'] = ['docs/usage.rst']
-
 setup(name=NAME,
       version=__version__,
       description='Automated Sphix documentation builder',
@@ -45,8 +38,6 @@ setup(name=NAME,
         "License :: OSI Approved :: Zope Public License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.6",
-#        "Programming Language :: Python :: 3",
-#        "Programming Language :: Python :: 3.1",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
       keywords='sphinx documentation',
