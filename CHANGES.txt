@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.2 (unreleased)
+----------------
+
+
 1.1 (2010-07-25)
 ----------------
 - Feature: The user can now provide a Sphinx configuration folder 
