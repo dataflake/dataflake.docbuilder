@@ -74,12 +74,13 @@ class DocsBuilder(object):
     def __init__(self):
         parser = optparse.OptionParser(option_list=OPTIONS)
         self.options, self.args = parser.parse_args()
+        self.packages = {}
 
         if not self.options.urls:
             parser.error('Please provide package SVN URLs')
 
         if not self.options.workingdir:
-            parser.error('Please provide an workingdir directory path')
+            parser.error('Please provide a workingdir directory path')
 
         if not os.path.isdir(self.options.workingdir):
             msg = 'Output folder %s does not exist.' % self.options.workingdir
@@ -95,16 +96,11 @@ class DocsBuilder(object):
 
     def run(self):
         for url in self.options.urls:
-            package_name, tag_names = self.checkout_or_update(url)
-            tag_data = self.build_html(package_name, tag_names)
+            package_name = self.checkout_or_update(url)
+            self.build_html(package_name)
+            self.link_html(package_name)
 
-            for tag_name, html_output_folder in tag_data.items():
-                self.link_html(package_name, tag_name, html_output_folder)
-
-            if not self.options.trunk_only:
-                self.create_index_html(package_name, tag_names)
-
-        self.create_main_index()
+        self.create_index_html()
 
     def _do_shell_command(self, cmd, fromwhere=None):
         cwd = os.getcwd()
@@ -116,48 +112,44 @@ class DocsBuilder(object):
             print '%s: %s' % (cmd, output)
         return output
 
-    def create_main_index(self):
-        tags_list = []
-        
-        for name in os.listdir(self.options.htmldir):
-            path = os.path.join(self.options.htmldir, name)
-            if os.path.isdir(path) or os.path.islink(path):
-                tags_list.append(LINK_HTML % {'name': name})
+    def create_index_html(self):
+        package_names = self.packages.keys()
+        package_names.sort()
+        package_text = ''
 
+        for package_name in package_names:
+            tags_list = []
+            tag_names = self.packages[package_name].keys()
+            tag_names.sort()
+            tag_names.reverse()
+
+            for tag_name in tag_names:
+                html_output_folder = self.packages[package_name][tag_name]
+                if html_output_folder:
+                    if tag_name == self.options.trunk_name:
+                        t_path = package_name
+                    else:
+                        t_path = '%s-%s' % (package_name, tag_name)
+
+                    tag_txt = LINK_HTML % { 'package_tag': tag_name
+                                          , 'package_tag_path': t_path
+                                          }
+                else:
+                    tag_txt = NOLINK_HTML % tag_name
+                tags_list.append(tag_txt)
+
+            package_text += PACKAGE_HTML % { 'package_name': package_name
+                                           , 'package_html': '\n'.join(tags_list)
+                                           }
+        
         index_file = open(os.path.join(self.options.htmldir, 'index.html'), 'w')
-        index_file.write( INDEX_HTML % { 'name': ''
-                                       , 'tags_text': '\n'.join(tags_list)
-                                       } )
+        index_file.write(INDEX_HTML % package_text)
         index_file.close()
 
-    def create_index_html(self, package_name, tag_names):
-        html_root_path = os.path.join(self.options.htmldir, package_name)
-        if not os.path.isdir(html_root_path):
-            os.mkdir(html_root_path)
-        tags_list = []
-
-        for tag_name in tag_names:
-            html_link = os.path.join(html_root_path, tag_name)
-            if os.path.exists(html_link):
-                tag_txt = LINK_HTML % {'name': tag_name}
-            else:
-                tag_txt = NOLINK_HTML % tag_name
-            tags_list.append(tag_txt)
-        
-        index_file = open(os.path.join(html_root_path, 'index.html'), 'w')
-        index_file.write( INDEX_HTML % { 'name': package_name
-                                       , 'tags_text': '\n'.join(tags_list)
-                                       } )
-        index_file.close()
-
-    def build_html(self, package_name, tag_names):
-        if 'trunk' not in tag_names:
-            tag_names.append('trunk')
-        tag_data = {}.fromkeys(tag_names)
-
+    def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
 
-        for tag in tag_names:
+        for tag in self.packages[package_name]:
             tag_folder = os.path.join(package_path, tag)
             doc_folder = None
             for folder_name in self.options.docs_folders:
@@ -200,37 +192,34 @@ class DocsBuilder(object):
                             , tags=None
                             )
             builder.build(True, None)
-            tag_data[tag] = html_output_folder
+            self.packages[package_name][tag] = html_output_folder
             sys.path = old_sys_path
 
-        return tag_data
+    def link_html(self, package_name):
+        p_data = self.packages[package_name]
+        tags_with_docs = [(x, p_data[x]) for x in p_data if p_data.get(x)]
 
-    def link_html(self, package_name, tag_name, html_output_folder):
-        if not html_output_folder:
-            return
+        for tag_name, html_output_folder in tags_with_docs:
+            if tag_name == self.options.trunk_name:
+                target_name = package_name
+            else:
+                target_name = '%s-%s' % (package_name, tag_name)
+            html_link_path = os.path.join(self.options.htmldir, target_name)
 
-        html_root_path = os.path.join(self.options.htmldir, package_name)
-
-        if not self.options.trunk_only:
-            if not os.path.isdir(html_root_path):
-                os.mkdir(html_root_path)
-            html_link_path = os.path.join(html_root_path, tag_name)
-        else:
-            html_link_path = html_root_path
-
-        if os.path.islink(html_link_path):
-            os.remove(html_link_path)
-        elif os.path.isdir(html_link_path):
-            shutil.rmtree(html_link_path)
-        elif os.path.lexists(html_link_path):
-            os.remove(html_link_path)
-        os.symlink(html_output_folder, html_link_path)
+            if os.path.islink(html_link_path):
+                os.remove(html_link_path)
+            elif os.path.isdir(html_link_path):
+                shutil.rmtree(html_link_path)
+            elif os.path.lexists(html_link_path):
+                os.remove(html_link_path)
+            os.symlink(html_output_folder, html_link_path)
 
     def checkout_or_update(self, package_url):
         parsed_url = list(urlparse.urlparse(package_url))
         package_name = [x for x in parsed_url[2].split('/') if x][-1]
         package_dir = os.path.join(self.options.workingdir, package_name)
         pythonpath = ':'.join(sys.path)
+        self.packages[package_name] = {}
 
         if not os.path.isdir(package_dir):
             os.mkdir(package_dir)
@@ -246,42 +235,49 @@ class DocsBuilder(object):
         cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
                 pythonpath, sys.executable, trunk_path)
         self._do_shell_command(cmd, fromwhere=trunk_path)
+        self.packages[package_name][self.options.trunk_name] = None
 
-        if self.options.trunk_only:
-            return (package_name, [])
+        if not self.options.trunk_only:
+            cmd = 'svn ls %s/%s' % (package_url, self.options.tags_name)
+            tag_names = [x.replace('/', '') for x in 
+                                    self._do_shell_command(cmd).split()]
+            tag_names.sort()
 
-        cmd = 'svn ls %s/%s' % (package_url, self.options.tags_name)
-        tag_names = [x.replace('/', '') for x in 
-                                self._do_shell_command(cmd).split()]
-        tag_names.sort()
+            for tag in tag_names:
+                tag_path = os.path.join(package_dir, tag)
+                if not os.path.isdir(tag_path):
+                    # We only check out; tags presumably do not change!
+                    cmd = 'svn co %s/%s/%s %s' % (
+                            package_url, self.options.tags_name, tag, tag_path)
+                    self._do_shell_command(cmd)
+                cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
+                           pythonpath, sys.executable, tag_path)
+                self._do_shell_command(cmd, fromwhere=tag_path)
+                self.packages[package_name][tag] = None
 
-        for tag in tag_names:
-            tag_path = os.path.join(package_dir, tag)
-            if not os.path.isdir(tag_path):
-                # We only check out; tags presumably do not change!
-                cmd = 'svn co %s/%s/%s %s' % (
-                        package_url, self.options.tags_name, tag, tag_path)
-                self._do_shell_command(cmd)
-            cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
-                       pythonpath, sys.executable, tag_path)
-            self._do_shell_command(cmd, fromwhere=tag_path)
-
-        return (package_name, tag_names)
+        return package_name
         
 INDEX_HTML = """\
 <html>
   <head>
-    <title>%(name)s documentation</title>
+    <title>Documentation</title>
   </head>
   <body>
-    <h1>%(name)s dumentation</h1>
-    <ul>
-%(tags_text)s
-    </ul>
+    <h1>Documentation</h1>
+    %s
   </body>
 </html>
 """
-LINK_HTML = '<li><a href="./%(name)s/index.html" alt="%(name)s">%(name)s</a></li>'
+LINK_HTML = """\
+<li><a href="./%(package_tag_path)s/index.html" 
+       alt="%(package_tag)s">%(package_tag)s</a></li>
+"""
 NOLINK_HTML = '<li>%s (no Sphinx documentation)</li>'
+PACKAGE_HTML = """\
+<p>
+<strong>%(package_name)s</strong>
+<ul>
+%(package_html)s
+</ul>
 
-
+"""

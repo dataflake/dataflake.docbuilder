@@ -5,6 +5,13 @@ Change log
 ----------------
 - Factoring: Moved the DocsBuilder class into its own module.
 
+- Factoring: Save run state on the documentation builder class 
+  instead of handing it around
+
+- Cosmetic: Use a flat hierarchy when creating the HTML output links
+  instead of a folder per package. Only a single index page needs to 
+  be created that way.
+
 
 1.0 (2010-07-23)
 ----------------
