@@ -16,6 +16,7 @@
 import os
 import pkg_resources
 
+import dataflake.docbuilder
 from dataflake.docbuilder.builder import DocsBuilder
 
 
@@ -57,6 +58,7 @@ class BuildoutScript:
         self.name = name
         self.options = options
         self.egg = zc.recipe.egg.Egg(self.buildout, self.name, self.options)
+        self.sw_path, ignored = os.path.split(dataflake.docbuilder.__file__)
 
     def install(self):
         import zc.buildout
@@ -86,8 +88,7 @@ class BuildoutScript:
         if self.options.get('index-template'):
             index_template = self.options['index-template']
         else:
-            bo_path = self.buildout['buildout']['directory']
-            index_template = os.path.join(bo_path, 'index_template')
+            index_template = os.path.join(self.sw_path, 'index_template')
         script_args.extend(['--index-template', index_template])
                 
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
