@@ -83,6 +83,12 @@ class BuildoutScript:
                                 ] )
         if self.options.get('trunk-only'):
             script_args.extend(['-t', self.options['trunk-only']])
+        if self.options.get('index-template'):
+            index_template = self.options['index-template']
+        else:
+            bo_path = self.buildout['buildout']['directory']
+            index_template = os.path.join(bo_path, 'index_template')
+        script_args.extend(['--index-template', index_template])
                 
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 

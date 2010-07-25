@@ -48,6 +48,11 @@ OPTIONS = (
                       , help='Only build trunk documentation? (default: False)'
                       , default=False
                       ),
+  optparse.make_option( '--index-template'
+                      , action='store'
+                      , dest='index_template'
+                      , help='Optional filesystem path containing Sphinx files for the output directory'
+                      ),
   optparse.make_option( '--docs-directory'
                       , action='append'
                       , dest='docs_folders'
@@ -114,37 +119,87 @@ class DocsBuilder(object):
 
     def create_index_html(self):
         package_names = self.packages.keys()
-        package_names.sort()
+        package_names.sort(key=str.lower)
         package_text = ''
+
+        if not self.options.index_template:
+            output = { 'package': PACKAGE_HTML
+                     , 'link': LINK_HTML
+                     , 'nolink': NOLINK_HTML
+                     }
+        else:
+            output = { 'package': PACKAGE_RST
+                     , 'link': LINK_RST
+                     , 'nolink': NOLINK_RST
+                     }
 
         for package_name in package_names:
             tags_list = []
             tag_names = self.packages[package_name].keys()
-            tag_names.sort()
+            tag_names.sort(key=str.lower)
             tag_names.reverse()
 
             for tag_name in tag_names:
                 html_output_folder = self.packages[package_name][tag_name]
-                if html_output_folder:
-                    if tag_name == self.options.trunk_name:
-                        t_path = package_name
-                    else:
-                        t_path = '%s-%s' % (package_name, tag_name)
+                tag_data = { 'package_name': package_name
+                           , 'package_tag': tag_name
+                           , 'package_tag_path': '%s-%s' % ( package_name
+                                                           , tag_name
+                                                           )
+                           }
+                if tag_name == self.options.trunk_name:
+                    tag_data['package_tag_path'] = package_name
+                    if self.options.trunk_only:
+                        tag_data['package_tag'] = ''
 
-                    tag_txt = LINK_HTML % { 'package_tag': tag_name
-                                          , 'package_tag_path': t_path
-                                          }
+                if html_output_folder:
+                    tag_txt = output['link'] % tag_data
                 else:
-                    tag_txt = NOLINK_HTML % tag_name
+                    tag_txt = output['nolink'] % tag_data
+
                 tags_list.append(tag_txt)
 
-            package_text += PACKAGE_HTML % { 'package_name': package_name
-                                           , 'package_html': '\n'.join(tags_list)
-                                           }
+            if self.options.trunk_only:
+                package_text += '%s\n' % tags_list[0]
+            else:
+                p_data = { 'package_name': package_name
+                         , 'package_output': '\n'.join(tags_list)
+                         , 'package_name_underline': '_' * len(package_name)
+                         }
+                package_text += output['package'] % p_data
         
-        index_file = open(os.path.join(self.options.htmldir, 'index.html'), 'w')
-        index_file.write(INDEX_HTML % package_text)
+        if not self.options.index_template:
+            path = os.path.join(self.options.htmldir, 'index.html')
+            index_file = open(path, 'w')
+            index_file.write(INDEX_HTML % package_text)
+            index_file.close()
+            return
+
+        path = os.path.join(self.options.index_template, 'index.rst')
+        template = os.path.join(self.options.index_template, 'index.rst.in')
+        if os.path.isfile(template):
+            template_file = open(template, 'r')
+            template_text = template_file.read()
+            template_file.close()
+            package_text = '%s\n\n%s' % (template_text, package_text)
+        index_file = open(path, 'w')
+        index_file.write(package_text)
         index_file.close()
+
+        dt = os.path.join(self.options.index_template, '_build', 'doctrees')
+        builder = Sphinx( self.options.index_template
+                        , self.options.index_template
+                        , self.options.htmldir
+                        , dt
+                        , 'html'
+                        , {}
+                        , None
+                        , warning=sys.stderr
+                        , freshenv=False
+                        , warningiserror=False
+                        , tags=None
+                        )
+        builder.build(True, None)
 
     def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
@@ -270,14 +325,24 @@ INDEX_HTML = """\
 """
 LINK_HTML = """\
 <li><a href="./%(package_tag_path)s/index.html" 
-       alt="%(package_tag)s">%(package_tag)s</a></li>
+       alt="%(package_tag)s">%(package_name)s %(package_tag)s</a></li>
 """
-NOLINK_HTML = '<li>%s (no Sphinx documentation)</li>'
+NOLINK_HTML = '<li>%(package_name)s %(package_version)s</li>'
 PACKAGE_HTML = """\
 <p>
 <strong>%(package_name)s</strong>
 <ul>
-%(package_html)s
+%(package_output)s
 </ul>
+
+"""
+LINK_RST = """\
+* `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
+"""
+NOLINK_RST = '* %(package_name)s %(package_tag)s'
+PACKAGE_RST = """
+%(package_name)s
+%(package_name_underline)s
+%(package_output)s
 
 """

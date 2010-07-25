@@ -3,6 +3,10 @@ Change log
 
 1.1 (unreleased)
 ----------------
+- Feature: The user can now provide a Sphinx configuration folder 
+  path that will be used to generate additional content for the 
+  documentation root folder.
+
 - Factoring: Moved the DocsBuilder class into its own module.
 
 - Factoring: Save run state on the documentation builder class 
