@@ -3,6 +3,9 @@ Change log
 
 1.2 (unreleased)
 ----------------
+- Bug: If pkg_resources.find_distributions cannot find valid
+  Egg distributions we still force the tag folder itself into the 
+  pkg_resources.working_set as a fallback.
 
 
 1.1 (2010-07-25)

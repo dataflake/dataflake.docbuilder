@@ -234,6 +234,9 @@ class DocsBuilder(object):
                 distribution.activate()
                 pkg_resources.working_set.add_entry(distribution.location)
 
+            if not distributions:
+                pkg_resources.working_set.add_entry(tag_folder)
+
             builder = Sphinx( doc_folder
                             , doc_folder
                             , html_output_folder
