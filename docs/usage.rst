@@ -33,6 +33,11 @@ which you can discover yourself by running ``docbuilder -h`` or
   which can be given multiple times, contains an URL to a package's 
   location in a :term:`Subversion` software repository.
 
+* ``-g <GROUP>`` or ``--grouping=<GROUP>``: You can group packages 
+  into groups to set them apart in the HTML output. A GROUP element
+  consists of the package name and the group name, separated by 
+  a colon (":") character. Example: `dataflake.docbuilder:dataflake`.
+
 * ``-w <PATH>`` or ``--working-directory=<PATH>``: The ``docbuilder`` 
   script will check out the packages and run the documentation build 
   process in this folder. This parameter is `mandatory` as well.
@@ -95,7 +100,7 @@ Here's a simple example::
   recipe = dataflake.docbuilder
   eggs =  
       repoze.sphinx.autointerface
-  source =
+  sources =
       http://svn.dataflake.org/svn/dataflake.docbuilder
 
 This configuration will create a script named ``docbuilderdocs`` 
@@ -110,7 +115,10 @@ above):
   and run, you need to list them here so they get pulled in 
   automatically.
 
-* ``source``: the ``--source`` parameter shown above. Mandatory.
+* ``sources``: Equivalent to one or more ``--source`` parameters shown 
+  above. Mandatory.
+
+* ``groupings``: One or more ``--grouping`` parameters as shown above.
 
 * ``working-directory``: the ``--working-directory`` parameter shown above.
   If none is specified, a default of 

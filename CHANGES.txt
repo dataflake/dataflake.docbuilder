@@ -3,6 +3,12 @@ Change log
 
 1.2 (unreleased)
 ----------------
+- Feature: Add new script option ``-g``/``--grouping`` and zc.buildout 
+  option ``grouping`` to group packages.
+
+- Miscellaneous: Renamed the zc.buildout option `source` to `sources`
+  since it contains one or more elements.
+
 - Miscellaneous: Removed the version pinning on the Sphinx dependency 
   since our other dependency (repoze.sphinx.autointerface) is now 
   compatible with Sphinx 1.0.

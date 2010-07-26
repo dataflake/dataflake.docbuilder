@@ -29,6 +29,12 @@ OPTIONS = (
                       , dest='urls'
                       , help='SVN URL (can be used multiple times)'
                       ),
+  optparse.make_option( '-g'
+                      , '--grouping'
+                      , action='append'
+                      , dest='groupings'
+                      , help='Package name to group name grouping, colon-separated'
+                      ),
   optparse.make_option( '-w'
                       , '--working-directory'
                       , action='store'
@@ -80,6 +86,7 @@ class DocsBuilder(object):
         parser = optparse.OptionParser(option_list=OPTIONS)
         self.options, self.args = parser.parse_args()
         self.packages = {}
+        self.group_map = {}
 
         if not self.options.urls:
             parser.error('Please provide package SVN URLs')
@@ -99,9 +106,19 @@ class DocsBuilder(object):
             msg = 'HTML output folder %s does not exist.' % self.options.htmldir
             parser.error(msg)
 
+        for group_spec in self.options.groupings or []:
+            package_name, group_name = [x.strip() for x in group_spec.split(':')]
+            group_values = self.group_map.setdefault(group_name, [])
+            group_values.append(package_name)
+
     def run(self):
+        grouped = []
+        [grouped.extend(x) for x in self.group_map.values()]
         for url in self.options.urls:
             package_name = self.checkout_or_update(url)
+            if package_name not in grouped:
+                group_values = self.group_map.setdefault('', [])
+                group_values.append(package_name)
             self.build_html(package_name)
             self.link_html(package_name)
 
@@ -118,55 +135,67 @@ class DocsBuilder(object):
         return output
 
     def create_index_html(self):
-        package_names = self.packages.keys()
-        package_names.sort(key=str.lower)
         package_text = ''
+        group_names = self.group_map.keys()
+        group_names.sort(key=str.lower)
 
         if not self.options.index_template:
             output = { 'package': PACKAGE_HTML
                      , 'link': LINK_HTML
                      , 'nolink': NOLINK_HTML
+                     , 'groupheader': GROUPHEADER_HTML
                      }
         else:
             output = { 'package': PACKAGE_RST
                      , 'link': LINK_RST
                      , 'nolink': NOLINK_RST
+                     , 'groupheader': GROUPHEADER_RST
                      }
 
-        for package_name in package_names:
-            tags_list = []
-            tag_names = self.packages[package_name].keys()
-            tag_names.sort(key=str.lower)
-            tag_names.reverse()
+        for group_name in group_names:
+            package_names = self.group_map.get(group_name)
+            package_names.sort(key=str.lower)
 
-            for tag_name in tag_names:
-                html_output_folder = self.packages[package_name][tag_name]
-                tag_data = { 'package_name': package_name
-                           , 'package_tag': tag_name
-                           , 'package_tag_path': '%s-%s' % ( package_name
-                                                           , tag_name
-                                                           )
-                           }
-                if tag_name == self.options.trunk_name:
-                    tag_data['package_tag_path'] = package_name
-                    if self.options.trunk_only:
-                        tag_data['package_tag'] = ''
+            if group_name:
+                group_data = { 'group_name': group_name
+                             , 'group_underline': '=' * len(group_name)
+                             }
+                package_text += output['groupheader'] % group_data
 
-                if html_output_folder:
-                    tag_txt = output['link'] % tag_data
+            for package_name in package_names:
+                tags_list = []
+                tag_names = self.packages[package_name].keys()
+                tag_names.sort(key=str.lower)
+                tag_names.reverse()
+
+                for tag_name in tag_names:
+                    html_output_folder = self.packages[package_name][tag_name]
+                    tag_data = { 'package_name': package_name
+                               , 'package_tag': tag_name
+                               , 'package_tag_path': '%s-%s' % ( package_name
+                                                               , tag_name
+                                                               )
+                               }
+                    if tag_name == self.options.trunk_name:
+                        tag_data['package_tag_path'] = package_name
+                        if self.options.trunk_only:
+                            tag_data['package_tag'] = ''
+
+                    if html_output_folder:
+                        tag_txt = output['link'] % tag_data
+                    else:
+                        tag_txt = output['nolink'] % tag_data
+
+                    tags_list.append(tag_txt)
+
+                if self.options.trunk_only:
+                    package_text += '%s\n' % tags_list[0]
                 else:
-                    tag_txt = output['nolink'] % tag_data
-
-                tags_list.append(tag_txt)
-
-            if self.options.trunk_only:
-                package_text += '%s\n' % tags_list[0]
-            else:
-                p_data = { 'package_name': package_name
-                         , 'package_output': '\n'.join(tags_list)
-                         , 'package_name_underline': '_' * len(package_name)
-                         }
-                package_text += output['package'] % p_data
+                    p_data = { 'package_name': package_name
+                             , 'package_output': '\n'.join(tags_list)
+                             , 'package_name_underline': '_' * len(package_name)
+                             }
+                    package_text += output['package'] % p_data
         
         if not self.options.index_template:
             path = os.path.join(self.options.htmldir, 'index.html')
@@ -339,6 +368,9 @@ PACKAGE_HTML = """\
 </ul>
 
 """
+GROUPHEADER_HTML = """
+<p><strong><u>%(group_name)s</u></strong></p>
+"""
 LINK_RST = """\
 * `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
 """
@@ -348,4 +380,8 @@ PACKAGE_RST = """
 %(package_name_underline)s
 %(package_output)s
 
+"""
+GROUPHEADER_RST = """
+%(group_name)s
+%(group_underline)s
 """

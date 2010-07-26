@@ -33,7 +33,7 @@ class BuildoutScript:
 
         script_name = options.get('script', name)
 
-        if not options.get('source'):
+        if not options.get('sources'):
             raise zc.buildout.UserError('Missing parameter: source (SVN URLs).')
 
         if not options.get('working-directory'):
@@ -67,8 +67,12 @@ class BuildoutScript:
 
         script_args = []
         script_args.extend(['-w', self.options['working-directory'].strip()])
-        for url in [x.strip() for x in self.options['source'].split()]:
+        for url in [x.strip() for x in self.options['sources'].split()]:
             script_args.extend(['-s', url])
+        if self.options.get('groupings'):
+            group_specs = self.options['groupings'].split('\n')
+            for group_spec in [x.strip() for x in group_specs if x]:
+                script_args.extend(['-g', group_spec])
         if self.options.get('output-directory'):
             script_args.extend(['-o', self.options['output-directory'].strip()])
         if self.options.get('docs-directory'):
