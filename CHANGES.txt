@@ -3,6 +3,10 @@ Change log
 
 1.2 (unreleased)
 ----------------
+- Miscellaneous: Removed the version pinning on the Sphinx dependency 
+  since our other dependency (repoze.sphinx.autointerface) is now 
+  compatible with Sphinx 1.0.
+
 - Bug: If pkg_resources.find_distributions cannot find valid
   Egg distributions we still force the tag folder itself into the 
   pkg_resources.working_set as a fallback.

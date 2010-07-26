@@ -50,7 +50,7 @@ setup(name=NAME,
       namespace_packages=['dataflake'],
       install_requires=[
         'setuptools',
-        'Sphinx <= 0.99',
+        'Sphinx',
         'docutils',
         'pkginfo',
         'zc.recipe.egg',
