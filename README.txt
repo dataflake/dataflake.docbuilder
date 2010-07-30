@@ -3,7 +3,7 @@
 ======================
 
 This package provides a set of scripts to automate building
-Sprinx-based package documentation for packages hosted on a 
+Sphinx-based package documentation for packages hosted on a 
 Subversion revision control server. They will...
 
 - check out the current development trunk and all tagged versions
