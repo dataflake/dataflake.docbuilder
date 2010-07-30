@@ -65,12 +65,6 @@ OPTIONS = (
                       , help='The index file name, without extension. Defaults to "index".'
                       , default='index'
                       ),
-  optparse.make_option( '--index-title'
-                      , action='store'
-                      , dest='index_title'
-                      , help='Optional title for the index page. Defaults to "Documentation".'
-                      , default='Documentation'
-                      ),
   optparse.make_option( '--docs-directory'
                       , action='append'
                       , dest='docs_folders'
@@ -156,11 +150,6 @@ class DocsBuilder(object):
                  , 'nolink': NOLINK_RST
                  , 'groupheader': GROUPHEADER_RST
                  }
-
-        if self.options.index_title:
-            index_text = '%s\n%s\n\n' % ( self.options.index_title
-                                        , '='*len(self.options.index_title)
-                                        )
 
         for group_name in group_names:
             package_names = self.group_map.get(group_name)

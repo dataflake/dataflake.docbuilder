@@ -105,10 +105,6 @@ class BuildoutScript:
         if self.options.get('index-name'):
             script_args.extend(['--index-name', self.options['index-name']])
 
-        if self.options.get('index-title'):
-            script_args.extend(['--index-title', self.options['index-title']])
-            
-                
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 
         arg = [(self.options['script'], self.options['recipe'], 'run_builder')]

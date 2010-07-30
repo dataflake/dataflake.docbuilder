@@ -70,9 +70,6 @@ which you can discover yourself by running ``docbuilder -h`` or
   containing links to the documented packages, and `Sphinx` will 
   compile it to the final ``<NAME>.html`` output.
 
-* ``--index-title=<TITLE>``: The title to be used for the index page.
-  Defaults to `Documentation`.
-
 * ``--docs-directory=<NAME>``: The folder name inside your software 
   package checkout where `Sphinx` documentation is stored. By 
   default, the folders `doc` and `docs` are searched. You can use this 
@@ -139,8 +136,6 @@ above):
 * ``index-template``: The ``index-template`` parameter shown above
 
 * ``index-name``: The ``--index-name`` parameter shown above
-
-* ``index-title``: The ``--index-title`` parameter shown above
 
 * ``docs-directory``: the ``--docs-directory`` parameter shown above
 
