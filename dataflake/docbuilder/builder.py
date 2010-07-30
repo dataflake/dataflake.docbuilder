@@ -45,7 +45,7 @@ OPTIONS = (
                       , '--output-directory'
                       , action='store'
                       , dest='htmldir'
-                      , help='Root folder for HTML output (default: $working-directory/html)'
+                      , help='Root folder for HTML output and links (default: $working-directory/html)'
                       ),
   optparse.make_option( '-t'
                       , '--trunk-only'
@@ -58,6 +58,18 @@ OPTIONS = (
                       , action='store'
                       , dest='index_template'
                       , help='Optional filesystem path containing Sphinx files for the output directory'
+                      ),
+  optparse.make_option( '--index-name'
+                      , action='store'
+                      , dest='index_name'
+                      , help='The index file name, without extension. Defaults to "index".'
+                      , default='index'
+                      ),
+  optparse.make_option( '--index-title'
+                      , action='store'
+                      , dest='index_title'
+                      , help='Optional title for the index page. Defaults to "Documentation".'
+                      , default='Documentation'
                       ),
   optparse.make_option( '--docs-directory'
                       , action='append'
@@ -122,7 +134,8 @@ class DocsBuilder(object):
             self.build_html(package_name)
             self.link_html(package_name)
 
-        self.create_index_html()
+        if self.options.index_template:
+            self.create_index_html()
 
     def _do_shell_command(self, cmd, fromwhere=None):
         cwd = os.getcwd()
@@ -135,22 +148,19 @@ class DocsBuilder(object):
         return output
 
     def create_index_html(self):
-        package_text = ''
+        index_text = ''
         group_names = self.group_map.keys()
         group_names.sort(key=str.lower)
+        output = { 'package': PACKAGE_RST
+                 , 'link': LINK_RST
+                 , 'nolink': NOLINK_RST
+                 , 'groupheader': GROUPHEADER_RST
+                 }
 
-        if not self.options.index_template:
-            output = { 'package': PACKAGE_HTML
-                     , 'link': LINK_HTML
-                     , 'nolink': NOLINK_HTML
-                     , 'groupheader': GROUPHEADER_HTML
-                     }
-        else:
-            output = { 'package': PACKAGE_RST
-                     , 'link': LINK_RST
-                     , 'nolink': NOLINK_RST
-                     , 'groupheader': GROUPHEADER_RST
-                     }
+        if self.options.index_title:
+            index_text = '%s\n%s\n\n' % ( self.options.index_title
+                                        , '='*len(self.options.index_title)
+                                        )
 
         for group_name in group_names:
             package_names = self.group_map.get(group_name)
@@ -160,7 +170,7 @@ class DocsBuilder(object):
                 group_data = { 'group_name': group_name
                              , 'group_underline': '=' * len(group_name)
                              }
-                package_text += output['groupheader'] % group_data
+                index_text += output['groupheader'] % group_data
 
             for package_name in package_names:
                 tags_list = []
@@ -189,31 +199,38 @@ class DocsBuilder(object):
                     tags_list.append(tag_txt)
 
                 if self.options.trunk_only:
-                    package_text += '%s\n' % tags_list[0]
+                    index_text += '%s\n' % tags_list[0]
                 else:
                     p_data = { 'package_name': package_name
                              , 'package_output': '\n'.join(tags_list)
                              , 'package_name_underline': '_' * len(package_name)
                              }
-                    package_text += output['package'] % p_data
+                    index_text += output['package'] % p_data
         
-        if not self.options.index_template:
-            path = os.path.join(self.options.htmldir, 'index.html')
-            index_file = open(path, 'w')
-            index_file.write(INDEX_HTML % package_text)
-            index_file.close()
-            return
-
-        path = os.path.join(self.options.index_template, 'index.rst')
-        template = os.path.join(self.options.index_template, 'index.rst.in')
-        if os.path.isfile(template):
-            template_file = open(template, 'r')
+        index_path = os.path.join( self.options.index_template
+                                 , '%s.rst' % self.options.index_name
+                                 )
+        needs_cleanup = [index_path]
+        template_path = os.path.join( self.options.index_template
+                                    , '%s.rst.in' % self.options.index_name
+                                    )
+        if os.path.isfile(template_path):
+            template_file = open(template_path, 'r')
             template_text = template_file.read()
             template_file.close()
-            package_text = '%s\n\n%s' % (template_text, package_text)
-        index_file = open(path, 'w')
-        index_file.write(package_text)
+            index_text = '%s\n\n%s' % (template_text, index_text)
+
+        index_file = open(index_path, 'w')
+        index_file.write(index_text)
         index_file.close()
+
+        required_index = os.path.join(self.options.index_template, 'index.rst')
+        if index_path != required_index and not os.path.isfile(required_index):
+            # Need to create a index.rst, otherwise Sphinx barfs
+            tmp_index = open(required_index, 'w')
+            tmp_index.write('')
+            tmp_index.close()
+            needs_cleanup.append(required_index)
 
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
         builder = Sphinx( self.options.index_template
@@ -229,6 +246,11 @@ class DocsBuilder(object):
                         , tags=None
                         )
         builder.build(True, None)
+
+        # cleanup
+        for path in needs_cleanup:
+            os.unlink(path)
+
 
     def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
@@ -343,34 +365,8 @@ class DocsBuilder(object):
                 self.packages[package_name][tag] = None
 
         return package_name
-        
-INDEX_HTML = """\
-<html>
-  <head>
-    <title>Documentation</title>
-  </head>
-  <body>
-    <h1>Documentation</h1>
-    %s
-  </body>
-</html>
-"""
-LINK_HTML = """\
-<li><a href="./%(package_tag_path)s/index.html" 
-       alt="%(package_tag)s">%(package_name)s %(package_tag)s</a></li>
-"""
-NOLINK_HTML = '<li>%(package_name)s %(package_version)s</li>'
-PACKAGE_HTML = """\
-<p>
-<strong>%(package_name)s</strong>
-<ul>
-%(package_output)s
-</ul>
 
-"""
-GROUPHEADER_HTML = """
-<p><strong><u>%(group_name)s</u></strong></p>
-"""
+
 LINK_RST = """\
 * `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
 """

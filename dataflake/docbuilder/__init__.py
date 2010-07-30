@@ -64,36 +64,50 @@ class BuildoutScript:
         import zc.buildout
 
         reqs, ws = self.egg.working_set([self.options['recipe']])
-
         script_args = []
+
         script_args.extend(['-w', self.options['working-directory'].strip()])
+
         for url in [x.strip() for x in self.options['sources'].split()]:
             script_args.extend(['-s', url])
+
         if self.options.get('groupings'):
             group_specs = self.options['groupings'].split('\n')
             for group_spec in [x.strip() for x in group_specs if x]:
                 script_args.extend(['-g', group_spec])
+
         if self.options.get('output-directory'):
             script_args.extend(['-o', self.options['output-directory'].strip()])
+
         if self.options.get('docs-directory'):
             df = [x.strip() for x in self.options['docs-directory'].split()]
             for doc_folder in df:
                 script_args.extend(['--docs-directory', doc_folder])
+
         if self.options.get('trunk-directory'):
             script_args.extend( [ '--trunk-directory'
                                 , self.options['trunk-directory']
                                 ] )
+
         if self.options.get('tags-directory'):
             script_args.extend( [ '--tags-directory'
                                 , self.options['tags-directory']
                                 ] )
         if self.options.get('trunk-only'):
             script_args.extend(['-t', self.options['trunk-only']])
+
         if self.options.get('index-template'):
             index_template = self.options['index-template']
         else:
             index_template = os.path.join(self.sw_path, 'index_template')
         script_args.extend(['--index-template', index_template])
+
+        if self.options.get('index-name'):
+            script_args.extend(['--index-name', self.options['index-name']])
+
+        if self.options.get('index-title'):
+            script_args.extend(['--index-title', self.options['index-title']])
+            
                 
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 

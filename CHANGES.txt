@@ -3,6 +3,19 @@ Change log
 
 1.3 (unreleased)
 ----------------
+- Feature: Added a script and buildout option ``index-name`` to 
+  specify the file name (without extension) for the index page.
+  With this option you can safely build the index page into an 
+  existing `Sphinx` documentation folder without overwriting 
+  or changing the existing ``index.rst`` file and its HTML 
+  equivalent. The default continues to be ``index.rst``, though.
+
+- Feature: Added a script and buildut option ``index-title`` to set 
+  the main headline and thus title for the index page.
+
+- Feature removed: It is no longer possible to create a simple HTML
+  index page without using `Sphinx` and a minimal `Sphinx` 
+  configuration.
 
 
 1.2 (2010-07-29)
