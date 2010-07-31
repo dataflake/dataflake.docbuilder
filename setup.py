@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-__version__ = '1.4'
+__version__ = '1.5dev'
 
 import os
 import sys
@@ -30,6 +30,8 @@ setup(name=NAME,
       description='Automated Sphix documentation builder',
       long_description=( read('README.txt') 
                        + _boundary 
+                       + read('CHANGES.txt')
+                       + _boundary
                        + "Download\n========"
                        ),
       classifiers=[

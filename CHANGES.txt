@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.5 (unreleased)
+----------------
+
+
 1.4 (2010-07-31)
 ----------------
 - Bug: Don't clean up intermediate files, otherwise it is not 
