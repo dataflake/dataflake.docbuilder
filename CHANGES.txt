@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.6 (unreleased)
+1.6 (2010-07-31)
 ----------------
 - Bug: If the ``z3csphinx-output-directory`` was set, all its 
   contained packages ended up on the index document. Now this 
