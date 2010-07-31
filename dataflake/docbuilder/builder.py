@@ -155,7 +155,8 @@ class DocsBuilder(object):
             package_names = self.group_map.get(group_name)
             package_names.sort(key=str.lower)
 
-            if group_name:
+            if group_name or (not group_name and len(group_names) > 1):
+                group_name = group_name or 'Ungrouped'
                 group_data = { 'group_name': group_name
                              , 'group_underline': '=' * len(group_name)
                              }
@@ -199,7 +200,6 @@ class DocsBuilder(object):
         index_path = os.path.join( self.options.index_template
                                  , '%s.rst' % self.options.index_name
                                  )
-        needs_cleanup = [index_path]
         template_path = os.path.join( self.options.index_template
                                     , '%s.rst.in' % self.options.index_name
                                     )
@@ -216,10 +216,14 @@ class DocsBuilder(object):
         required_index = os.path.join(self.options.index_template, 'index.rst')
         if index_path != required_index and not os.path.isfile(required_index):
             # Need to create a index.rst, otherwise Sphinx barfs
+            required_index_contents = ''
+            if os.path.isfile('%s.in' % required_index):
+                tmpl = open('%s.in' % required_index, 'r')
+                required_index_contents = tmpl.read()
+                tmpl.close()
             tmp_index = open(required_index, 'w')
-            tmp_index.write('')
+            tmp_index.write(required_index_contents)
             tmp_index.close()
-            needs_cleanup.append(required_index)
 
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
         builder = Sphinx( self.options.index_template
@@ -235,10 +239,6 @@ class DocsBuilder(object):
                         , tags=None
                         )
         builder.build(True, None)
-
-        # cleanup
-        for path in needs_cleanup:
-            os.unlink(path)
 
 
     def build_html(self, package_name):
