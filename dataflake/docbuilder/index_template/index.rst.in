@@ -1,7 +1,13 @@
-Documentation list by :mod:`dataflake.docbuilder`
----------------------------------------------------
+===================================================
+ Documentation list by :mod:`dataflake.docbuilder`
+===================================================
 
 .. note::
 
     Packages that are not linked do not provide any `Sphinx` documentation.
 
+.. toctree::
+    :maxdepth: 2
+
+    apple
+    banana

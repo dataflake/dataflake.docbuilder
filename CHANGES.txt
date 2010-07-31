@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.4 (unreleased)
+1.4 (2010-07-31)
 ----------------
 - Bug: Don't clean up intermediate files, otherwise it is not 
   possible to re-use a template folder for creating several
