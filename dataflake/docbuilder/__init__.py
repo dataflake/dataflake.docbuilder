@@ -32,9 +32,17 @@ class BuildoutScript:
         import zc.recipe.egg
 
         script_name = options.get('script', name)
-
         if not options.get('sources'):
+            options['sources'] = ''
+
+        if ( not options.get('sources') and 
+             not options.get('z3csphinx-output-directory') ):
             raise zc.buildout.UserError('Missing parameter: source (SVN URLs).')
+
+        z3csphinx_doc_root = options.get('z3csphinx-output-directory')
+        if z3csphinx_doc_root and not os.path.isdir(z3csphinx_doc_root):
+            msg = 'z3c.recipe.sphinxdoc output folder %s does not exist'
+            raise zc.buildout.UserError(msg % z3csphinx_doc_root)
 
         if not options.get('working-directory'):
             parts = buildout['buildout']['parts-directory']
@@ -104,6 +112,11 @@ class BuildoutScript:
 
         if self.options.get('index-name'):
             script_args.extend(['--index-name', self.options['index-name']])
+
+        if self.options.get('z3csphinx-output-directory'):
+            script_args.extend( [ '--z3csphinx-output-directory'
+                                , self.options.get('z3csphinx-output-directory')
+                                ] )
 
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 

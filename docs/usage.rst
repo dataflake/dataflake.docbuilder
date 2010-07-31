@@ -83,6 +83,12 @@ which you can discover yourself by running ``docbuilder -h`` or
   :term:`Subversion` location where version tags are stored. By default
   a name of `tags` is used.
 
+* ``--z3csphinx-output-directory=<PATH``: If you generate some 
+  documentation via :mod:`z3c.recipe.sphinxdoc` and want to stitch 
+  links to it into the generated index file, you can provide the 
+  path to the :mod:`z3c.recipe.sphinxdoc` root folder for its 
+  generated docs here.
+
 * ``-h`` or ``--help``: Show the help text.
 
 If the package to be documented or its `Sphinx` documentation 
@@ -142,4 +148,7 @@ above):
 * ``trunk-directory``: the ``--trunk-directory`` parameter shown above
 
 * ``tags-directory``: the ``--tags-directory`` parameter shown above
+
+* ``z3csphinx-output-directory``: the ``--z3csphinx-output-directory``
+  parameter shown above.
 

@@ -83,6 +83,11 @@ OPTIONS = (
                       , help='Development tags container name (default: "tags")'
                       , default='tags'
                       ),
+  optparse.make_option( '--z3csphinx-output-directory'
+                      , action='store'
+                      , dest='z3csphinx_output_directory'
+                      , help='Root folder for z3c.recipe.sphinx-generated documentation'
+                      ),
 )
 
 
@@ -94,7 +99,8 @@ class DocsBuilder(object):
         self.packages = {}
         self.group_map = {}
 
-        if not self.options.urls:
+        if ( not self.options.urls and
+             not self.options.z3csphinx_output_directory ):
             parser.error('Please provide package SVN URLs')
 
         if not self.options.workingdir:
@@ -117,15 +123,34 @@ class DocsBuilder(object):
             group_values = self.group_map.setdefault(group_name, [])
             group_values.append(package_name)
 
+        self.z3csphinx_packages = []
+        if self.options.z3csphinx_output_directory:
+            root_pkgs = os.listdir(self.options.z3csphinx_output_directory)
+
+            for pkg_name in root_pkgs:
+                pkg_docs = os.path.join( self.options.z3csphinx_output_directory
+                                       , pkg_name
+                                       , 'build'
+                                       , pkg_name
+                                       )
+                self.z3csphinx_packages.append(pkg_name)
+                self.packages[pkg_name] = {self.options.trunk_name: pkg_docs}
+
+
     def run(self):
         grouped = []
         [grouped.extend(x) for x in self.group_map.values()]
-        for url in self.options.urls:
-            package_name = self.checkout_or_update(url)
+
+        for url in self.options.urls or []:
+            self.checkout_or_update(url)
+
+        for package_name in self.packages.keys():
             if package_name not in grouped:
                 group_values = self.group_map.setdefault('', [])
                 group_values.append(package_name)
-            self.build_html(package_name)
+
+            if package_name not in self.z3csphinx_packages:
+                self.build_html(package_name)
             self.link_html(package_name)
 
         if self.options.index_template:
