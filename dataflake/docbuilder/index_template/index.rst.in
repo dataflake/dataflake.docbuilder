@@ -6,8 +6,4 @@
 
     Packages that are not linked do not provide any `Sphinx` documentation.
 
-.. toctree::
-    :maxdepth: 2
 
-    apple
-    banana
