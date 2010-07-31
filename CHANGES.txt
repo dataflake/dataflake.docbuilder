@@ -3,6 +3,11 @@ Change log
 
 1.6 (unreleased)
 ----------------
+- Bug: If the ``z3csphinx-output-directory`` was set, all its 
+  contained packages ended up on the index document. Now this 
+  only happens if no SVN source URLs are otherwise provided.
+  If they are, only packages from those source URLs are 
+  considered for linking on the index document.
 
 
 1.5 (2010-07-31)

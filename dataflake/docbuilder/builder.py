@@ -123,7 +123,7 @@ class DocsBuilder(object):
             group_values = self.group_map.setdefault(group_name, [])
             group_values.append(package_name)
 
-        self.z3csphinx_packages = []
+        self.z3csphinx_packages = {}
         if self.options.z3csphinx_output_directory:
             root_pkgs = os.listdir(self.options.z3csphinx_output_directory)
 
@@ -133,9 +133,10 @@ class DocsBuilder(object):
                                        , 'build'
                                        , pkg_name
                                        )
-                self.z3csphinx_packages.append(pkg_name)
-                self.packages[pkg_name] = {self.options.trunk_name: pkg_docs}
+                self.z3csphinx_packages[pkg_name] = pkg_docs
 
+                if not self.options.urls:
+                    self.packages[pkg_name] = {self.options.trunk_name: pkg_docs}
 
     def run(self):
         grouped = []
@@ -151,6 +152,9 @@ class DocsBuilder(object):
 
             if package_name not in self.z3csphinx_packages:
                 self.build_html(package_name)
+            else:
+                pkg_docs = self.z3csphinx_packages.get(package_name)
+                self.packages[package_name][self.options.trunk_name] = pkg_docs
             self.link_html(package_name)
 
         if self.options.index_template:
@@ -343,6 +347,9 @@ class DocsBuilder(object):
         package_dir = os.path.join(self.options.workingdir, package_name)
         pythonpath = ':'.join(sys.path)
         self.packages[package_name] = {}
+
+        if package_name in self.z3csphinx_packages:
+            return package_name
 
         if not os.path.isdir(package_dir):
             os.mkdir(package_dir)
