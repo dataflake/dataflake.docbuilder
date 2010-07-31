@@ -278,7 +278,8 @@ class DocsBuilder(object):
             doc_folder = None
             for folder_name in self.options.docs_folders:
                 doc_candidate = os.path.join(tag_folder, folder_name)
-                if os.path.isdir(doc_candidate):
+                if ( os.path.isdir(doc_candidate) and 
+                     os.path.isfile(os.path.join(doc_candidate, 'conf.py')) ):
                     doc_folder = doc_candidate
                     break
 
@@ -364,7 +365,9 @@ class DocsBuilder(object):
             self._do_shell_command(cmd)
         cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
                 pythonpath, sys.executable, trunk_path)
-        self._do_shell_command(cmd, fromwhere=trunk_path)
+
+        if os.path.isdir(trunk_path):
+            self._do_shell_command(cmd, fromwhere=trunk_path)
         self.packages[package_name][self.options.trunk_name] = None
 
         if not self.options.trunk_only:
