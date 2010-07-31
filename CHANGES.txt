@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.7 (unreleased)
+----------------
+
+
 1.6 (2010-07-31)
 ----------------
 - Bug: If the ``z3csphinx-output-directory`` was set, all its 
