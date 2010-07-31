@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.6 (unreleased)
+----------------
+
+
 1.5 (2010-07-31)
 ----------------
 - Feature: If you generate some documentation via 
