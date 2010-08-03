@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.8 (unreleased)
+----------------
+
+
 1.7 (2010-08-03)
 ----------------
 - Feature: If no standard package documentation can be found, 
