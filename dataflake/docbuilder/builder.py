@@ -14,6 +14,8 @@
 """
 
 import commands
+import cStringIO
+from docutils.core import publish_file
 import optparse
 import os
 import pkg_resources
@@ -64,6 +66,11 @@ OPTIONS = (
                       , dest='index_name'
                       , help='The index file name, without extension. Defaults to "index".'
                       , default='index'
+                      ),
+  optparse.make_option( '--fallback-css'
+                      , action='store'
+                      , dest='fallback_css'
+                      , help='Path to a CSS file with styles used for plain ReST documentation'
                       ),
   optparse.make_option( '--docs-directory'
                       , action='append'
@@ -269,6 +276,30 @@ class DocsBuilder(object):
                         )
         builder.build(True, None)
 
+    def _build_simple_rst(self, package_name, tag_name):
+        """ Build HTML output from the setuptools long_description
+        """
+        package_path = os.path.join(self.options.workingdir, package_name)
+        tag_folder = os.path.join(package_path, tag_name)
+        cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
+                  ':'.join(sys.path), sys.executable, tag_folder)
+        rst = self._do_shell_command(cmd, fromwhere=tag_folder)
+
+        if rst and rst != 'UNKNOWN':
+            build_folder = os.path.join(tag_folder, '.docbuilder_html')
+            shutil.rmtree(build_folder, ignore_errors=True)
+            os.mkdir(build_folder)
+            output_path = os.path.join(build_folder, 'index.html')
+            settings = {}
+            if os.path.isfile(self.options.fallback_css):
+                settings = {'stylesheet_path': self.options.fallback_css}
+            publish_file( source=cStringIO.StringIO(rst)
+                        , writer_name='html'
+                        , destination_path=output_path
+                        , settings_overrides=settings
+                        )
+            self.packages[package_name][tag_name] = build_folder
+
 
     def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
@@ -284,6 +315,8 @@ class DocsBuilder(object):
                     break
 
             if not doc_folder:
+                # Last fallback: long description from setup.py
+                self._build_simple_rst(package_name, tag)
                 continue
 
             build_folder = os.path.join(doc_folder, '.build')

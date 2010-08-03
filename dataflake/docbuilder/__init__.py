@@ -118,6 +118,13 @@ class BuildoutScript:
                                 , self.options.get('z3csphinx-output-directory')
                                 ] )
 
+        if self.options.get('fallback-css'):
+            fallback_css = self.options['fallback-css']
+        else:
+            template_dir = os.path.join(self.sw_path, 'index_template')
+            fallback_css = os.path.join(template_dir, '_static', 'python.css')
+        script_args.extend([ '--fallback-css', fallback_css])
+
         init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
 
         arg = [(self.options['script'], self.options['recipe'], 'run_builder')]

@@ -70,6 +70,11 @@ which you can discover yourself by running ``docbuilder -h`` or
   containing links to the documented packages, and `Sphinx` will 
   compile it to the final ``<NAME>.html`` output.
 
+* ``--fallback-css=<PATH>``: Optional path to a CSS file used for
+  styling converted ReST output generated from the :ref:`setuptools`
+  ``long_description`` package option. The ``long_description`` value 
+  is used as a fallback if no full Sphinx documentation can be found.
+
 * ``--docs-directory=<NAME>``: The folder name inside your software 
   package checkout where `Sphinx` documentation is stored. By 
   default, the folders `doc` and `docs` are searched. You can use this 
@@ -142,6 +147,8 @@ above):
 * ``index-template``: The ``index-template`` parameter shown above
 
 * ``index-name``: The ``--index-name`` parameter shown above
+
+* ``fallback-css``: The ``--fallback-css`` parameter shown above
 
 * ``docs-directory``: the ``--docs-directory`` parameter shown above
 
