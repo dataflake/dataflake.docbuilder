@@ -279,11 +279,13 @@ class DocsBuilder(object):
     def _build_simple_rst(self, package_name, tag_name):
         """ Build HTML output from the setuptools long_description
         """
+        rst = ''
         package_path = os.path.join(self.options.workingdir, package_name)
         tag_folder = os.path.join(package_path, tag_name)
-        cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
-                  ':'.join(sys.path), sys.executable, tag_folder)
-        rst = self._do_shell_command(cmd, fromwhere=tag_folder)
+        if os.path.isdir(tag_folder):
+            cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
+                      ':'.join(sys.path), sys.executable, tag_folder)
+            rst = self._do_shell_command(cmd, fromwhere=tag_folder)
 
         if rst and rst != 'UNKNOWN':
             build_folder = os.path.join(tag_folder, '.docbuilder_html')
