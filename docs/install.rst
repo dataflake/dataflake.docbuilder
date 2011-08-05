@@ -7,6 +7,7 @@ run :mod:`dataflake.docbuilder`.  Development of
 that version is recommended.
 
 .. warning:: 
+
    To successfully install :mod:`dataflake.docbuilder`, 
    you will need an environment capable of compiling Python C code.  
    See the documentation about installing, e.g. ``gcc`` and 
