@@ -31,7 +31,12 @@ which you can discover yourself by running ``docbuilder -h`` or
 
 * ``-s <URLS>`` or ``--source=<URLS>``: This `mandatory` parameter, 
   which can be given multiple times, contains an URL to a package's 
-  location in a :term:`Subversion` software repository.
+  location in a software version control repository.
+
+* ``-r <RCS>`` or ``--rcs-system=<RCS>``: This parameter determines 
+  how the scripts speak with your version control system. You can 
+  specify either ``svn`` for :term:`Subversion` or ``hg`` for 
+  :term:`Mercurial` at this point. The default is ``svn``.
 
 * ``-g <GROUP>`` or ``--grouping=<GROUP>``: You can group packages 
   into groups to set them apart in the HTML output. A GROUP element
@@ -81,12 +86,14 @@ which you can discover yourself by running ``docbuilder -h`` or
   parameter multiple times to add other folder names to the default list.
 
 * ``--trunk-directory=<NAME>``: The folder name inside your package's 
-  :term:`Subversion` location where the most current development happens.
-  By default a name of `trunk` is used.
+  revision control location where the most current development happens.
+  By default a name of `trunk` is used. This parameter is only relevant 
+  for :term:`Subversion` repositories.
 
 * ``--tags-directory=<NAME>``: The folder name inside your package's 
-  :term:`Subversion` location where version tags are stored. By default
-  a name of `tags` is used.
+  revision control location where version tags are stored. By default
+  a name of `tags` is used. This parameter is only relevant for 
+  :term:`Subversion` repositories.
 
 * ``--z3csphinx-output-directory=<PATH>``: If you generate some 
   documentation via :mod:`z3c.recipe.sphinxdoc` and want to stitch 
@@ -134,15 +141,18 @@ above):
 * ``sources``: Equivalent to one or more ``--source`` parameters shown 
   above. Mandatory.
 
+* ``rcs-system``: The ``-rcs-system`` parameter shown above. Valid choices
+  are ``hg`` or ``svn``, by default ``svn`` is used.
+
 * ``groupings``: One or more ``--grouping`` parameters as shown above.
 
-* ``working-directory``: the ``--working-directory`` parameter shown above.
+* ``working-directory``: The ``--working-directory`` parameter shown above.
   If none is specified, a default of 
   ``{buildout:directory}/parts/<SCRIPTNAME>`` is used.
 
-* ``output-directory``: the ``--output-directory`` parameter shown above
+* ``output-directory``: The ``--output-directory`` parameter shown above
 
-* ``trunk-only``: the ``--trunk-only`` parameter shown above
+* ``trunk-only``: The ``--trunk-only`` parameter shown above
 
 * ``index-template``: The ``index-template`` parameter shown above
 
@@ -150,12 +160,12 @@ above):
 
 * ``fallback-css``: The ``--fallback-css`` parameter shown above
 
-* ``docs-directory``: the ``--docs-directory`` parameter shown above
+* ``docs-directory``: The ``--docs-directory`` parameter shown above
 
-* ``trunk-directory``: the ``--trunk-directory`` parameter shown above
+* ``trunk-directory``: The ``--trunk-directory`` parameter shown above
 
-* ``tags-directory``: the ``--tags-directory`` parameter shown above
+* ``tags-directory``: The ``--tags-directory`` parameter shown above
 
-* ``z3csphinx-output-directory``: the ``--z3csphinx-output-directory``
+* ``z3csphinx-output-directory``: The ``--z3csphinx-output-directory``
   parameter shown above.
 

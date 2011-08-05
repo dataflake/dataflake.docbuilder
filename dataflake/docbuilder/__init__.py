@@ -79,6 +79,9 @@ class BuildoutScript:
         for url in [x.strip() for x in self.options['sources'].split()]:
             script_args.extend(['-s', url])
 
+        if self.options.get('rcs-system'):
+            script_args.extend(['-r', self.options['rcs-system'])
+
         if self.options.get('groupings'):
             group_specs = self.options['groupings'].split('\n')
             for group_spec in [x.strip() for x in group_specs if x]:

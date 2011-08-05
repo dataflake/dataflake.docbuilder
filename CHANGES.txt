@@ -3,6 +3,8 @@ Change log
 
 1.8 (unreleased)
 ----------------
+- Feature: You can now use either ``Subversion`` or ``Mercurial``
+  for packages to check out.
 
 
 1.7 (2010-08-03)

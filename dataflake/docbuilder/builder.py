@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2010 Jens Vagelpohl and Contributors. All Rights Reserved.
+# Copyright (c) 2010-2011 Jens Vagelpohl and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -13,7 +13,6 @@
 """ The documentation builder class
 """
 
-import commands
 import cStringIO
 from docutils.core import publish_file
 import optparse
@@ -22,14 +21,26 @@ import pkg_resources
 import shutil
 from sphinx.application import Sphinx
 import sys
-import urlparse
+
+from dataflake.docbuilder.rcs import HGClient
+from dataflake.docbuilder.rcs import SVNClient
+from dataflake.docbuilder.utils import shell_cmd
+
+SUPPORTED_VCS = {'svn': SVNClient, 'hg': HGClient}
 
 OPTIONS = (
   optparse.make_option( '-s'
                       , '--source'
                       , action='append'
                       , dest='urls'
-                      , help='SVN URL (can be used multiple times)'
+                      , help='VCS URL (can be used multiple times)'
+                      ),
+  optparse.make_option( '-r'
+                      , '--rcs-system'
+                      , action='store'
+                      , dest='rcs'
+                      , help='Revision control system in use. Valid values are "svn" and "hg". Default is "svn".'
+                      , default='svn'
                       ),
   optparse.make_option( '-g'
                       , '--grouping'
@@ -108,7 +119,14 @@ class DocsBuilder(object):
 
         if ( not self.options.urls and
              not self.options.z3csphinx_output_directory ):
-            parser.error('Please provide package SVN URLs')
+            parser.error('Please provide package VCS URLs')
+
+        if self.options.rcs.lower() not in SUPPORTED_VCS:
+            msg = 'Unsupported revision control system "%s"'
+            parser.error(msg % self.options.rcs)
+
+        rcs_class = SUPPORTED_VCS[self.options.rcs.lower()]
+        self.rcs = rcs_class(self.options.trunk_name, self.options.tags_name)
 
         if not self.options.workingdir:
             parser.error('Please provide a workingdir directory path')
@@ -150,7 +168,16 @@ class DocsBuilder(object):
         [grouped.extend(x) for x in self.group_map.values()]
 
         for url in self.options.urls or []:
-            self.checkout_or_update(url)
+            package_name = self.rcs.name_from_url(url)
+            if package_name not in self.z3csphinx_packages:
+                info = self.rcs.checkout_or_update( url
+                                                  , self.options.workingdir
+                                                  , self.options.trunk_only
+                                                  )
+            else:
+                info = {}
+
+            self.packages[package_name] = info
 
         for package_name in self.packages.keys():
             if package_name not in grouped:
@@ -166,16 +193,6 @@ class DocsBuilder(object):
 
         if self.options.index_template:
             self.create_index_html()
-
-    def _do_shell_command(self, cmd, fromwhere=None):
-        cwd = os.getcwd()
-        if fromwhere:
-            os.chdir(fromwhere)
-        status, output = commands.getstatusoutput(cmd)
-        os.chdir(cwd)
-        if status:
-            print '%s: %s' % (cmd, output)
-        return output
 
     def create_index_html(self):
         index_text = ''
@@ -285,7 +302,7 @@ class DocsBuilder(object):
         if os.path.isdir(tag_folder):
             cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
                       ':'.join(sys.path), sys.executable, tag_folder)
-            rst = self._do_shell_command(cmd, fromwhere=tag_folder)
+            rst = shell_cmd(cmd, fromwhere=tag_folder)
 
         if rst and rst != 'UNKNOWN':
             build_folder = os.path.join(tag_folder, '.docbuilder_html')
@@ -376,54 +393,6 @@ class DocsBuilder(object):
             elif os.path.lexists(html_link_path):
                 os.remove(html_link_path)
             os.symlink(html_output_folder, html_link_path)
-
-    def checkout_or_update(self, package_url):
-        parsed_url = list(urlparse.urlparse(package_url))
-        package_name = [x for x in parsed_url[2].split('/') if x][-1]
-        package_dir = os.path.join(self.options.workingdir, package_name)
-        pythonpath = ':'.join(sys.path)
-        self.packages[package_name] = {}
-
-        if package_name in self.z3csphinx_packages:
-            return package_name
-
-        if not os.path.isdir(package_dir):
-            os.mkdir(package_dir)
-
-        trunk_path = os.path.join(package_dir, self.options.trunk_name)
-        if os.path.isdir(trunk_path):
-            self._do_shell_command('svn up %s' % trunk_path)
-        else:
-            url_elements = parsed_url[:]
-            url_elements[2] = os.path.join(parsed_url[2], self.options.trunk_name)
-            cmd = 'svn co %s %s' % (urlparse.urlunparse(url_elements), trunk_path)
-            self._do_shell_command(cmd)
-        cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
-                pythonpath, sys.executable, trunk_path)
-
-        if os.path.isdir(trunk_path):
-            self._do_shell_command(cmd, fromwhere=trunk_path)
-        self.packages[package_name][self.options.trunk_name] = None
-
-        if not self.options.trunk_only:
-            cmd = 'svn ls %s/%s' % (package_url, self.options.tags_name)
-            tag_names = [x.replace('/', '') for x in 
-                                    self._do_shell_command(cmd).split()]
-            tag_names.sort()
-
-            for tag in tag_names:
-                tag_path = os.path.join(package_dir, tag)
-                if not os.path.isdir(tag_path):
-                    # We only check out; tags presumably do not change!
-                    cmd = 'svn co %s/%s/%s %s' % (
-                            package_url, self.options.tags_name, tag, tag_path)
-                    self._do_shell_command(cmd)
-                cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
-                           pythonpath, sys.executable, tag_path)
-                self._do_shell_command(cmd, fromwhere=tag_path)
-                self.packages[package_name][tag] = None
-
-        return package_name
 
 
 LINK_RST = """\
