@@ -71,7 +71,7 @@ which you can discover yourself by running ``docbuilder -h`` or
   compile it to the final ``<NAME>.html`` output.
 
 * ``--fallback-css=<PATH>``: Optional path to a CSS file used for
-  styling converted ReST output generated from the :ref:`setuptools`
+  styling converted ReST output generated from the :term:`setuptools`
   ``long_description`` package option. The ``long_description`` value 
   is used as a fallback if no full Sphinx documentation can be found.
 

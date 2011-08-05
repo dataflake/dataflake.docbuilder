@@ -6,7 +6,8 @@ run :mod:`dataflake.docbuilder`.  Development of
 :mod:`dataflake.docbuilder` is done primarily under Python 2.6, so 
 that version is recommended.
 
-.. warning:: To successfully install :mod:`dataflake.docbuilder`, 
+.. warning:: 
+   To successfully install :mod:`dataflake.docbuilder`, 
    you will need an environment capable of compiling Python C code.  
    See the documentation about installing, e.g. ``gcc`` and 
    ``python-devel`` for your system.  You will also need 
