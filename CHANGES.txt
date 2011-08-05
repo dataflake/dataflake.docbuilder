@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.9 (unreleased)
+----------------
+
+
 1.8 (2011-08-05)
 ----------------
 - Feature: You can now use either ``Subversion`` or ``Mercurial``
