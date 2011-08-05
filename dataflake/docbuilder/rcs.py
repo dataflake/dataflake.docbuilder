@@ -44,9 +44,7 @@ class RCSClient(object):
         if os.path.isdir(trunk_path):
             self.update(trunk_path)
         else:
-            url_bits = list(urlparse.urlparse(url))
-            url_bits[2] = url_bits[2] + '/' + self.trunk_name
-            self.checkout(urlparse.urlunparse(url_bits), trunk_path)
+            self.checkout(url, trunk_path)
 
         self.activate_egg(trunk_path)
         package_info[self.trunk_name] = None
@@ -120,6 +118,7 @@ class HGClient(RCSClient):
         """ Get all tag names from a repository URL
         """
         tags = []
+        checkout_path = os.path.join(checkout_path, self.trunk_name)
         output = shell_cmd('hg tags', fromwhere=checkout_path)
         for line in output.split('\n'):
             tag, revision = line.split()
@@ -138,7 +137,7 @@ class SVNClient(RCSClient):
     def checkout(self, url, checkout_path):
         """ Check out from a repository
         """
-        shell_cmd('svn co %s %s' % (url, checkout_path))
+        shell_cmd('svn co %s/%s %s' % (url, self.trunk_name, checkout_path))
 
     def checkout_tag(self, url, tag, checkout_path):
         """ Check out a specific tag
