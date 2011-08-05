@@ -80,7 +80,7 @@ class BuildoutScript:
             script_args.extend(['-s', url])
 
         if self.options.get('rcs-system'):
-            script_args.extend(['-r', self.options['rcs-system'])
+            script_args.extend(['-r', self.options['rcs-system']])
 
         if self.options.get('groupings'):
             group_specs = self.options['groupings'].split('\n')
