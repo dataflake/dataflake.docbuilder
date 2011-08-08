@@ -130,9 +130,7 @@ class BuildoutScript:
             fallback_css = os.path.join(template_dir, '_static', 'python.css')
         script_args.extend([ '--fallback-css', fallback_css])
 
-        init_code = INITIALIZATION % { 'script_arguments': str(script_args)
-                                     , 'bindir': self.options['bin-directory']
-                                     }
+        init_code = INITIALIZATION % {'script_arguments': str(script_args)}
 
         arg = [(self.options['script'], self.options['recipe'], 'run_builder')]
         return zc.buildout.easy_install.scripts( arg
