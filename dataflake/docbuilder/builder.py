@@ -27,7 +27,7 @@ from dataflake.docbuilder.rcs import HGClient
 from dataflake.docbuilder.rcs import SVNClient
 from dataflake.docbuilder.utils import shell_cmd
 
-SUPPORTED_VCS = {'svn': SVNClient(), 'hg': HGClient()}
+SUPPORTED_VCS = {'svn': SVNClient, 'hg': HGClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (
@@ -158,15 +158,16 @@ class DocsBuilder(object):
         for url in self.options.urls or []:
             re_match = VCS_SPEC_MATCH.search(url)
             if re_match is not None:
-                rcs = SUPPORTED_VCS.get(re_match.groups()[0].lower())
+                rcs_class = SUPPORTED_VCS.get(re_match.groups()[0].lower())
                 package_url = re_match.groups()[1].strip()
             else:
-                rcs = SUPPORTED_VCS.get('svn')
+                rcs_class = SUPPORTED_VCS.get('svn')
                 package_url = url
 
-            if rcs is None:
+            if rcs_class is None:
                 continue
 
+            rcs = rcs_class(self.options.trunk_name, self.options.tags_name)
             package_name = rcs.name_from_url(package_url)
             if package_name not in self.z3csphinx_packages:
                 info = rcs.checkout_or_update( package_url
@@ -217,8 +218,13 @@ class DocsBuilder(object):
             for package_name in package_names:
                 tags_list = []
                 tag_names = self.packages[package_name].keys()
-                tag_names.sort(key=str.lower)
+                tag_names.sort(key=pkg_resources.parse_version)
                 tag_names.reverse()
+
+                # Make sure trunk stays at the top
+                if self.options.trunk_name in tag_names:
+                    tag_names.remove(self.options.trunk_name)
+                    tag_names.insert(0, self.options.trunk_name)
 
                 for tag_name in tag_names:
                     html_output_folder = self.packages[package_name][tag_name]

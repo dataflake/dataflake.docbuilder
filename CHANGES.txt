@@ -3,6 +3,8 @@ Change log
 
 1.9 (unreleased)
 ----------------
+- Now using pkg_resources.parse_version to parse the tag names and 
+  produce correct release ordering for each package
 - Instead of using a flag to set the revision control system 
   across all packages you now specify the revision control system 
   per package with a simple prefix::
