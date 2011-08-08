@@ -20,6 +20,14 @@ documentation builder within your buildout configuration file.
    documentation can be built (such as third-party `Sphinx` extensions) 
    you must make them available yourself. How to do so is shown below.
 
+.. warning::
+
+    The document build script will call the Subversion or Mercurial 
+    script through the shell. Make sure you can check out or update 
+    the packages you want to document without receiving any prompts, 
+    e.g. for credentials, otherwise the script will just hang waiting 
+    for input on a prompt you will never see.
+
 From :term:`Setuptools`
 -----------------------
 
