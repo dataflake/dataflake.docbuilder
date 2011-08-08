@@ -31,12 +31,13 @@ which you can discover yourself by running ``docbuilder -h`` or
 
 * ``-s <URLS>`` or ``--source=<URLS>``: This `mandatory` parameter, 
   which can be given multiple times, contains an URL to a package's 
-  location in a software version control repository.
-
-* ``-r <RCS>`` or ``--rcs-system=<RCS>``: This parameter determines 
-  how the scripts speak with your version control system. You can 
-  specify either ``svn`` for :term:`Subversion` or ``hg`` for 
-  :term:`Mercurial` at this point. The default is ``svn``.
+  location in a software version control repository. You can prefix 
+  the URL with information about the revision control server used, 
+  if no prefix is given, :term:`Subversion` is assumed::
+  
+    [hg]https://myserver/hg/mypackage
+    [svn]https://myserver/svn/mypackage
+    https://myserver/svn/myotherpackage
 
 * ``-g <GROUP>`` or ``--grouping=<GROUP>``: You can group packages 
   into groups to set them apart in the HTML output. A GROUP element
@@ -140,9 +141,6 @@ above):
 
 * ``sources``: Equivalent to one or more ``--source`` parameters shown 
   above. Mandatory.
-
-* ``rcs-system``: The ``-rcs-system`` parameter shown above. Valid choices
-  are ``hg`` or ``svn``, by default ``svn`` is used.
 
 * ``groupings``: One or more ``--grouping`` parameters as shown above.
 

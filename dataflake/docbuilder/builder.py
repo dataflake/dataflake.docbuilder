@@ -18,6 +18,7 @@ from docutils.core import publish_file
 import optparse
 import os
 import pkg_resources
+import re
 import shutil
 from sphinx.application import Sphinx
 import sys
@@ -26,7 +27,8 @@ from dataflake.docbuilder.rcs import HGClient
 from dataflake.docbuilder.rcs import SVNClient
 from dataflake.docbuilder.utils import shell_cmd
 
-SUPPORTED_VCS = {'svn': SVNClient, 'hg': HGClient}
+SUPPORTED_VCS = {'svn': SVNClient(), 'hg': HGClient()}
+VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (
   optparse.make_option( '-s'
@@ -34,13 +36,6 @@ OPTIONS = (
                       , action='append'
                       , dest='urls'
                       , help='VCS URL (can be used multiple times)'
-                      ),
-  optparse.make_option( '-r'
-                      , '--rcs-system'
-                      , action='store'
-                      , dest='rcs'
-                      , help='Revision control system in use. Valid values are "svn" and "hg". Default is "svn".'
-                      , default='svn'
                       ),
   optparse.make_option( '-g'
                       , '--grouping'
@@ -121,13 +116,6 @@ class DocsBuilder(object):
              not self.options.z3csphinx_output_directory ):
             parser.error('Please provide package VCS URLs')
 
-        if self.options.rcs.lower() not in SUPPORTED_VCS:
-            msg = 'Unsupported revision control system "%s"'
-            parser.error(msg % self.options.rcs)
-
-        rcs_class = SUPPORTED_VCS[self.options.rcs.lower()]
-        self.rcs = rcs_class(self.options.trunk_name, self.options.tags_name)
-
         if not self.options.workingdir:
             parser.error('Please provide a workingdir directory path')
 
@@ -168,12 +156,23 @@ class DocsBuilder(object):
         [grouped.extend(x) for x in self.group_map.values()]
 
         for url in self.options.urls or []:
-            package_name = self.rcs.name_from_url(url)
+            re_match = VCS_SPEC_MATCH.search(url)
+            if re_match is not None:
+                rcs = SUPPORTED_VCS.get(re_match.groups()[0].lower())
+                package_url = re_match.groups()[1].strip()
+            else:
+                rcs = SUPPORTED_VCS.get('svn')
+                package_url = url
+
+            if rcs is None:
+                continue
+
+            package_name = rcs.name_from_url(package_url)
             if package_name not in self.z3csphinx_packages:
-                info = self.rcs.checkout_or_update( url
-                                                  , self.options.workingdir
-                                                  , self.options.trunk_only
-                                                  )
+                info = rcs.checkout_or_update( package_url
+                                             , self.options.workingdir
+                                             , self.options.trunk_only
+                                             )
             else:
                 info = {}
 

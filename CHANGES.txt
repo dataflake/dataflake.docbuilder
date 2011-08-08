@@ -3,6 +3,15 @@ Change log
 
 1.9 (unreleased)
 ----------------
+- Instead of using a flag to set the revision control system 
+  across all packages you now specify the revision control system 
+  per package with a simple prefix::
+
+    [hg]http://myserver/hg/mypackage
+    [svn]https://myservr/svnmypackage
+
+  For backwards compatibility, all URLs without prefix are assumed 
+  to point to a Subversion repository.
 
 
 1.8 (2011-08-05)

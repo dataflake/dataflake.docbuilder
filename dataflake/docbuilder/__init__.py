@@ -19,6 +19,11 @@ import pkg_resources
 import dataflake.docbuilder
 from dataflake.docbuilder.builder import DocsBuilder
 
+INITIALIZATION = """\
+import sys
+sys.argv.extend(%(script_arguments)s)
+"""
+
 
 def run_builder():
     builder = DocsBuilder()
@@ -79,9 +84,6 @@ class BuildoutScript:
         for url in [x.strip() for x in self.options['sources'].split()]:
             script_args.extend(['-s', url])
 
-        if self.options.get('rcs-system'):
-            script_args.extend(['-r', self.options['rcs-system']])
-
         if self.options.get('groupings'):
             group_specs = self.options['groupings'].split('\n')
             for group_spec in [x.strip() for x in group_specs if x]:
@@ -128,7 +130,9 @@ class BuildoutScript:
             fallback_css = os.path.join(template_dir, '_static', 'python.css')
         script_args.extend([ '--fallback-css', fallback_css])
 
-        init_code = 'import sys; sys.argv.extend(%s)' % str(script_args)
+        init_code = INITIALIZATION % { 'script_arguments': str(script_args)
+                                     , 'bindir': self.options['bin-directory']
+                                     }
 
         arg = [(self.options['script'], self.options['recipe'], 'run_builder')]
         return zc.buildout.easy_install.scripts( arg
