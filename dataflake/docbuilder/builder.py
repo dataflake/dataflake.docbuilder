@@ -24,13 +24,14 @@ import shutil
 from sphinx.application import Sphinx
 import sys
 
+from dataflake.docbuilder.rcs import GitClient
 from dataflake.docbuilder.rcs import HGClient
 from dataflake.docbuilder.rcs import SVNClient
 from dataflake.docbuilder.utils import shell_cmd
 
 LOG = logging.getLogger()
 LOG.addHandler(logging.StreamHandler(sys.stdout))
-SUPPORTED_VCS = {'svn': SVNClient, 'hg': HGClient}
+SUPPORTED_VCS = {'svn': SVNClient, 'git': GitClient, 'hg': HGClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (

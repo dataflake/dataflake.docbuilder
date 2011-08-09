@@ -33,6 +33,10 @@ Glossary
     `Mercurial <http://mercurial.selenic.com/>`_ is a distributed 
     software version control system.
 
+  Git
+    `Git <http://git-scm.com/>`_ is a distributed software version 
+    control system.
+
   zc.buildout
     `zc.buildout <http://buildout.org>`_ is a Python-based build system 
     for creating, assembling and deploying applications.

@@ -139,6 +139,36 @@ class HGClient(RCSClient):
         tags.sort()
         return tags
 
+class GitClient(RCSClient):
+
+    def update(self, checkout_path):
+        """ Update an existing checkout
+        """
+        shell_cmd('git pull -a', fromwhere=checkout_path)       
+    
+    def checkout(self, url, checkout_path):
+        """ Check out from a repository
+        """
+        shell_cmd('git clone %s %s' % (url, checkout_path))
+
+    def checkout_tag(self, url, tag, checkout_path):
+        """ Check out a specific tag
+        """
+        self.checkout(url, checkout_path)
+        shell_cmd('git checkout %s' % tag, fromwhere=checkout_path)
+
+    def get_tag_names(self, url, checkout_path):
+        """ Get all tag names from a repository URL
+        """
+        tags = []
+        checkout_path = os.path.join(checkout_path, self.trunk_name)
+        output = shell_cmd('git tag', fromwhere=checkout_path)
+        for line in output.split('\n'):
+            tags.append(line.strip())
+        tags.sort()
+        return tags
+
+
 class SVNClient(RCSClient):
 
     def update(self, checkout_path):
