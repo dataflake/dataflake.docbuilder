@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.10 (unreleased)
+1.10 (2011-08-09)
 -----------------
 - Taking more control of logging by defining our own logger and
   suppressing standard Sphinx log output. The new script flag 
