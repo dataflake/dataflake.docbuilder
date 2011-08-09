@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.11 (unreleased)
+1.11 (2011-08-09)
 -----------------
 - Now you can use ``Git`` alongside ``Mercurial`` and 
   ``Subversion`` to use as version control system.
