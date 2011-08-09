@@ -68,6 +68,11 @@ which you can discover yourself by running ``docbuilder -h`` or
   package in :term:`Subversion`. If you set this flag only documentation 
   from the development trunk will be built.
 
+* ``-v`` or ``--verbose``: Set the log verbosity. If ``--v`` is 
+  specified you will see more detailed logging output. If you 
+  specify it more than once all :mod:`Sphinx` documentation build 
+  output will be shown as well.
+
 * ``--index-template=<PATH>``: This optional parameter contains a 
   filesystem path to a folder containing a `Sphinx` configuration and 
   templates/static files. If you provide such a path 
@@ -159,6 +164,8 @@ above):
 * ``output-directory``: The ``--output-directory`` parameter shown above
 
 * ``trunk-only``: The ``--trunk-only`` parameter shown above
+
+* ``verbose``: The ``--verbose`` parameter shown above
 
 * ``index-template``: The ``index-template`` parameter shown above
 

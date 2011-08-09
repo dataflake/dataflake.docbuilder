@@ -13,6 +13,7 @@
 """ Abstracted revision control
 """
 
+import logging
 import os
 import sys
 import urlparse
@@ -24,9 +25,14 @@ class RCSClient(object):
     """ RCS client base class.
     """
 
-    def __init__(self, trunk_name='trunk', tags_name='tags'):
+    def __init__( self
+                , trunk_name='trunk'
+                , tags_name='tags'
+                , logger=logging.getLogger()
+                ):
         self.trunk_name = trunk_name
         self.tags_name = tags_name
+        self.logger = logger
 
     def checkout_or_update( self
                           , url
@@ -42,8 +48,10 @@ class RCSClient(object):
 
         trunk_path = os.path.join(package_dir, self.trunk_name)
         if os.path.isdir(trunk_path):
+            self.logger.info('Updating %s trunk' % package_name)
             self.update(trunk_path)
         else:
+            self.logger.info('Checking out %s trunk' % package_name)
             self.checkout(url, trunk_path)
 
         self.activate_egg(trunk_path)
@@ -65,8 +73,12 @@ class RCSClient(object):
         for tag in tag_names:
             tag_path = os.path.join(package_dir, tag)
             if not os.path.isdir(tag_path):
+                self.logger.info('Checking out %s %s' % (package_name, tag))
                 self.checkout_tag(package_url, tag, tag_path)
                 self.activate_egg(tag_path)
+            else:
+                 msg = 'Already checked out: %s %s' % (package_name, tag)
+                 self.logger.info(msg)
 
         return tag_names
 

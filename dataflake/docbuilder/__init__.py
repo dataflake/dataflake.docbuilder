@@ -109,6 +109,9 @@ class BuildoutScript:
         if self.options.get('trunk-only'):
             script_args.extend(['-t', self.options['trunk-only']])
 
+        if self.options.get('verbose'):
+            script_args.extend(['-v', self.options['verbose']])
+
         if self.options.get('index-template'):
             index_template = self.options['index-template']
         else:

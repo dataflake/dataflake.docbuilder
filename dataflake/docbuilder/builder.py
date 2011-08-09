@@ -15,6 +15,7 @@
 
 import cStringIO
 from docutils.core import publish_file
+import logging
 import optparse
 import os
 import pkg_resources
@@ -27,6 +28,8 @@ from dataflake.docbuilder.rcs import HGClient
 from dataflake.docbuilder.rcs import SVNClient
 from dataflake.docbuilder.utils import shell_cmd
 
+LOG = logging.getLogger()
+LOG.addHandler(logging.StreamHandler(sys.stdout))
 SUPPORTED_VCS = {'svn': SVNClient, 'hg': HGClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
@@ -61,6 +64,12 @@ OPTIONS = (
                       , dest='trunk_only'
                       , help='Only build trunk documentation? (default: False)'
                       , default=False
+                      ),
+  optparse.make_option( '-v'
+                      , '--verbose'
+                      , action='count'
+                      , dest='verbose'
+                      , help='Log verbosity'
                       ),
   optparse.make_option( '--index-template'
                       , action='store'
@@ -131,6 +140,11 @@ class DocsBuilder(object):
             msg = 'HTML output folder %s does not exist.' % self.options.htmldir
             parser.error(msg)
 
+        if self.options.verbose:
+            LOG.setLevel(logging.DEBUG)
+        else:
+            LOG.setLevel(logging.WARNING)
+
         for group_spec in self.options.groupings or []:
             package_name, group_name = [x.strip() for x in group_spec.split(':')]
             group_values = self.group_map.setdefault(group_name, [])
@@ -165,11 +179,16 @@ class DocsBuilder(object):
                 package_url = url
 
             if rcs_class is None:
+                LOG.warning('Unsupported VCS URL, ignoring: %s' % url)
                 continue
 
-            rcs = rcs_class(self.options.trunk_name, self.options.tags_name)
+            rcs = rcs_class( self.options.trunk_name
+                           , self.options.tags_name
+                           , logger=LOG
+                           )
             package_name = rcs.name_from_url(package_url)
             if package_name not in self.z3csphinx_packages:
+                LOG.info('Checking out %s' % package_url)
                 info = rcs.checkout_or_update( package_url
                                              , self.options.workingdir
                                              , self.options.trunk_only
@@ -364,6 +383,11 @@ class DocsBuilder(object):
             if not distributions:
                 pkg_resources.working_set.add_entry(tag_folder)
 
+            if self.options.verbose and self.options.verbose > 1:
+                output_pipeline = sys.stderr
+            else:
+                output_pipeline = None
+
             builder = Sphinx( doc_folder
                             , doc_folder
                             , html_output_folder
@@ -371,12 +395,16 @@ class DocsBuilder(object):
                             , 'html'
                             , {}
                             , None
-                            , warning=sys.stderr
+                            , warning=output_pipeline
                             , freshenv=False
                             , warningiserror=False
                             , tags=None
                             )
+            LOG.info('Building documentation for %s %s' % (package_name, tag))
             builder.build(True, None)
+            warnings = getattr(builder, '_warncount', 0)
+            if warnings:
+                LOG.info('Sphinx build generated %s warnings/errors.' % warnings)
             self.packages[package_name][tag] = html_output_folder
             sys.path = old_sys_path
 

@@ -3,6 +3,13 @@ Change log
 
 1.10 (unreleased)
 -----------------
+- Taking more control of logging by defining our own logger and
+  suppressing standard Sphinx log output. The new script flag 
+  ``-v`` or ``--verbose`` enables the user to determine what to 
+  show. Without it, only serious warnings are shown. With ``-v``
+  specified once you will see script progress output and notes 
+  about Sphinx build warnings. With ``-vv`` all Sphinx output 
+  is shown as well.
 
 
 1.9 (2011-08-09)
