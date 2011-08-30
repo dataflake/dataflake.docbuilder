@@ -15,6 +15,7 @@
 
 import cStringIO
 from docutils.core import publish_file
+from docutils.utils import SystemMessage
 import logging
 import optparse
 import os
@@ -337,12 +338,17 @@ class DocsBuilder(object):
             settings = {}
             if os.path.isfile(self.options.fallback_css):
                 settings = {'stylesheet_path': self.options.fallback_css}
-            publish_file( source=cStringIO.StringIO(rst)
-                        , writer_name='html'
-                        , destination_path=output_path
-                        , settings_overrides=settings
-                        )
-            self.packages[package_name][tag_name] = build_folder
+            try:
+                publish_file( source=cStringIO.StringIO(rst)
+                            , writer_name='html'
+                            , destination_path=output_path
+                            , settings_overrides=settings
+                            )
+                self.packages[package_name][tag_name] = build_folder
+            except SystemMessage, e:
+                msg = 'Building simple ReST doc for %s %s failed!'
+                LOG.error(msg % (package_name, tag_name))
+                pass
 
 
     def build_html(self, package_name):

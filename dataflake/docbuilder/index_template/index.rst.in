@@ -4,6 +4,8 @@
 
 .. note::
 
-    Packages that are not linked do not provide any `Sphinx` documentation.
+    Packages that are not linked either do not provide any 
+    supported documentation (:mod:`Sphinx` or other ReST 
+    text) documentation, or the documentation failed to build.
 
 
