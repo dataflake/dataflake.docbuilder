@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.12 (unreleased)
+1.12 (2011-08-30)
 -----------------
 - Be more resilient when simple ReST text compilation or 
   Sphinx building fails. Now the whole documentation build 
