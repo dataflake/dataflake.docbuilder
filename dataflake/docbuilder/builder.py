@@ -345,6 +345,8 @@ class DocsBuilder(object):
                             , settings_overrides=settings
                             )
                 self.packages[package_name][tag_name] = build_folder
+                msg = 'Building simple ReST docs for %s %s.'
+                LOG.info(msg % (package_name, tag_name))
             except SystemMessage, e:
                 msg = 'Building simple ReST doc for %s %s failed!'
                 LOG.error(msg % (package_name, tag_name))
@@ -395,25 +397,29 @@ class DocsBuilder(object):
             else:
                 output_pipeline = None
 
-            builder = Sphinx( doc_folder
-                            , doc_folder
-                            , html_output_folder
-                            , os.path.join(build_folder, 'doctrees')
-                            , 'html'
-                            , {}
-                            , None
-                            , warning=output_pipeline
-                            , freshenv=False
-                            , warningiserror=False
-                            , tags=None
-                            )
-            LOG.info('Building documentation for %s %s' % (package_name, tag))
-            builder.build(True, None)
-            warnings = getattr(builder, '_warncount', 0)
-            if warnings:
-                LOG.info('Sphinx build generated %s warnings/errors.' % warnings)
-            self.packages[package_name][tag] = html_output_folder
-            sys.path = old_sys_path
+            try:
+                builder = Sphinx( doc_folder
+                                , doc_folder
+                                , html_output_folder
+                                , os.path.join(build_folder, 'doctrees')
+                                , 'html'
+                                , {}
+                                , None
+                                , warning=output_pipeline
+                                , freshenv=False
+                                , warningiserror=False
+                                , tags=None
+                                )
+                LOG.info('Building Sphinx docs for %s %s' % (package_name, tag))
+                builder.build(True, None)
+                warnings = getattr(builder, '_warncount', 0)
+                if warnings:
+                    LOG.info('Sphinx build generated %s warnings/errors.' % warnings)
+                self.packages[package_name][tag] = html_output_folder
+                sys.path = old_sys_path
+            except pkg_resources.DistributionNotFound, e:
+                msg = 'Building Sphinx docs for %s %s failed: missing dependency %s'
+                LOG.error(msg % (package_name, tag, str(e)))
 
     def link_html(self, package_name):
         p_data = self.packages[package_name]

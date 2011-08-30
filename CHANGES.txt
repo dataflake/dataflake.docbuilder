@@ -3,9 +3,11 @@ Change log
 
 1.12 (unreleased)
 -----------------
-- Be more resilient when simple ReST text compilation fails. 
-  Now the whole documentation build process won't just fail 
-  at that point.
+- Be more resilient when simple ReST text compilation or 
+  Sphinx building fails. Now the whole documentation build 
+  process won't just fail at that point.
+- provide more meaningful log messages when running with 
+  the ``-v`` option.
 
 
 1.11 (2011-08-09)
