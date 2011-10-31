@@ -1,6 +1,12 @@
 Change log
 ==========
 
+1.13 (2011-10-31)
+-----------------
+- Catch additional errors upon building
+- Ignoring empty tag lists when asking Git for tags
+
+
 1.12 (2011-08-30)
 -----------------
 - Be more resilient when simple ReST text compilation or 

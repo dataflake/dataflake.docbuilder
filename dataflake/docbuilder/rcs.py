@@ -163,9 +163,10 @@ class GitClient(RCSClient):
         tags = []
         checkout_path = os.path.join(checkout_path, self.trunk_name)
         output = shell_cmd('git tag', fromwhere=checkout_path)
-        for line in output.split('\n'):
-            tags.append(line.strip())
-        tags.sort()
+        if output:
+            for line in output.split('\n'):
+                tags.append(line.strip())
+            tags.sort()
         return tags
 
 

@@ -420,6 +420,9 @@ class DocsBuilder(object):
             except pkg_resources.DistributionNotFound, e:
                 msg = 'Building Sphinx docs for %s %s failed: missing dependency %s'
                 LOG.error(msg % (package_name, tag, str(e)))
+            except IndexError, e:
+                msg = 'Building Sphinx docs for %s %s failed: %s'
+                LOG.error(msg % (package_name, tag, str(e)))
 
     def link_html(self, package_name):
         p_data = self.packages[package_name]
