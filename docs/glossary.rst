@@ -7,7 +7,7 @@ Glossary
 ============================
 
 .. glossary::
-    :sorted:
+  :sorted:
 
   Interface
     An attribute of a model object that determines its type.  It is an
