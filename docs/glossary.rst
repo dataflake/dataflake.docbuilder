@@ -7,7 +7,6 @@ Glossary
 ============================
 
 .. glossary::
-
     :sorted:
 
   Interface
