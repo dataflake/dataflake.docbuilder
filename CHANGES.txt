@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.14 (unreleased)
+1.14 (2011-11-29)
 -----------------
 - Add a flag ``-m``/``--max-tags`` to set the number of package
   versions (tags) to be shown on the generated main page. If more
