@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.15 (unreleased)
+-----------------
+
+
 1.14 (2011-11-29)
 -----------------
 - Add a flag ``-m``/``--max-tags`` to set the number of package
