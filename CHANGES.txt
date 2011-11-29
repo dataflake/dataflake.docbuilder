@@ -3,6 +3,10 @@ Change log
 
 1.14 (unreleased)
 -----------------
+- Add a flag ``-m``/``--max-tags`` to set the number of package
+  versions (tags) to be shown on the generated main page. If more
+  tags exist, a link to a separate page is provided that shows all
+  versions.
 
 
 1.13 (2011-10-31)

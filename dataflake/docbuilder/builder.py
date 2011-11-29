@@ -67,6 +67,13 @@ OPTIONS = (
                       , help='Only build trunk documentation? (default: False)'
                       , default=False
                       ),
+  optparse.make_option( '-m'
+                      , '--max-tags'
+                      , action='store'
+                      , dest='max_tags'
+                      , help='Max number of tags to show on the index page. If the value is "0" or "1", only the trunk is build. Default: 5'
+                      , default=5
+                      ),
   optparse.make_option( '-v'
                       , '--verbose'
                       , action='count'
@@ -141,6 +148,11 @@ class DocsBuilder(object):
         elif not os.path.isdir(self.options.htmldir):
             msg = 'HTML output folder %s does not exist.' % self.options.htmldir
             parser.error(msg)
+
+        try:
+            self.options.max_tags = int(self.options.max_tags)
+        except ValueError:
+            paster.error('Please specify a numeric value for --max-tags.')
 
         if self.options.verbose:
             LOG.setLevel(logging.DEBUG)
@@ -270,12 +282,32 @@ class DocsBuilder(object):
                 if self.options.trunk_only:
                     index_text += '%s\n' % tags_list[0]
                 else:
+                    if len(tags_list) > self.options.max_tags:
+                        index_tags = tags_list[:self.options.max_tags]
+                        more_link = MORE_RST % {'package_name': package_name}
+                    else:
+                        index_tags = tags_list[:]
+                        more_link = ''
                     p_data = { 'package_name': package_name
-                             , 'package_output': '\n'.join(tags_list)
+                             , 'package_output': '\n'.join(index_tags)
                              , 'package_name_underline': '_' * len(package_name)
                              }
                     index_text += output['package'] % p_data
-        
+                    index_text += more_link
+
+                    # Create separate per-package page
+                    pkg_file_path = os.path.join( self.options.index_template
+                                                , '%s.rst' % package_name
+                                                )
+                    package_file = open(pkg_file_path, 'w')
+                    pkg_data = { 'package_name': package_name
+                               , 'package_output': '\n'.join(tags_list)
+                               , 'package_name_underline': '=' * len(package_name)
+                               }
+                    package_file.write(':orphan:\n\n')
+                    package_file.write(output['package'] % pkg_data)
+                    package_file.close()
+
         index_path = os.path.join( self.options.index_template
                                  , '%s.rst' % self.options.index_name
                                  )
@@ -286,9 +318,12 @@ class DocsBuilder(object):
             template_file = open(template_path, 'r')
             template_text = template_file.read()
             template_file.close()
-            index_text = '%s\n\n%s' % (template_text, index_text)
+        else:
+            template_text = ''
 
         index_file = open(index_path, 'w')
+        index_file.write(template_text)
+        index_file.write('\n\n')
         index_file.write(index_text)
         index_file.close()
 
@@ -446,6 +481,10 @@ class DocsBuilder(object):
 
 LINK_RST = """\
 * `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
+"""
+MORE_RST = """\
+`view all versions... <./%(package_name)s.html>`_
+
 """
 NOLINK_RST = '* %(package_name)s %(package_tag)s'
 PACKAGE_RST = """

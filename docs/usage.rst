@@ -69,6 +69,12 @@ which you can discover yourself by running ``docbuilder -h`` or
   package in :term:`Subversion`. If you set this flag only documentation 
   from the development trunk will be built.
 
+* ``-m`` or ``--max-tags``: When building documentation for package 
+  trunks and all tags this flag specifies how many tags to show on 
+  the main index page. If more tags exist, a link to a separate 
+  page is inserted that shows all tags for the given package. The 
+  default value is 5.
+
 * ``-v`` or ``--verbose``: Set the log verbosity. If ``--v`` is 
   specified you will see more detailed logging output. If you 
   specify it more than once all :mod:`Sphinx` documentation build 
@@ -165,6 +171,8 @@ above):
 * ``output-directory``: The ``--output-directory`` parameter shown above
 
 * ``trunk-only``: The ``--trunk-only`` parameter shown above
+
+* ``max-tags``: The ``--max-tags`` parameter shown above
 
 * ``verbose``: The ``--verbose`` parameter shown above
 

@@ -109,6 +109,9 @@ class BuildoutScript:
         if self.options.get('trunk-only'):
             script_args.extend(['-t', self.options['trunk-only']])
 
+        if self.options.get('max-tags'):
+            script_args.extend(['-m', self.options['max-tags']])
+
         if self.options.get('verbose'):
             script_args.extend(['-v', self.options['verbose']])
 
