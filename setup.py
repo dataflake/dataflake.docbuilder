@@ -50,6 +50,7 @@ setup(name=NAME,
       packages=find_packages(),
       include_package_data=True,
       namespace_packages=['dataflake'],
+      setup_requires=['setuptools-git'],
       install_requires=[
         'setuptools',
         'Sphinx',
