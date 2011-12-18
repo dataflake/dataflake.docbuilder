@@ -4,7 +4,8 @@
 
 This package provides a set of scripts to automate building
 Sphinx-based package documentation for packages hosted on a 
-Subversion revision control server. They will...
+source code revision control server such as Subversion, 
+Git or Mercurial. They will...
 
 - check out the current development trunk and all tagged versions
 
@@ -21,17 +22,10 @@ Documentation
 =============
 Full documentation for the last released version is at 
 http://packages.python.org/dataflake.docbuilder. For  
-documentation matching the current SVN trunk please visit 
-http://docs.dataflake.org/dataflake.docbuilder.
+documentation matching the current development version 
+please visit http://docs.dataflake.org/dataflake.docbuilder.
 
 Bug tracker
 ===========
 A bug tracker is available at https://bugs.launchpad.net/dataflake.docbuilder
-
-SVN version
-===========
-You can retrieve the latest code from Subversion using setuptools or
-zc.buildout via this URL:
-
-http://svn.dataflake.org/svn/dataflake.docbuilder/trunk#egg=dataflake.docbuilder
 

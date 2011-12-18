@@ -58,7 +58,6 @@ setup(name=NAME,
         'zc.recipe.egg',
         ],
       zip_safe=False,
-      test_suite='%s.tests' % NAME,
       entry_points = {
           'console_scripts': ['docbuilder = %s:run_builder' % NAME],
           'zc.buildout': ['default=%s:BuildoutScript' % NAME]
