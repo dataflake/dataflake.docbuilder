@@ -1,11 +1,14 @@
 
 # /
 /eggs
+/.eggs
 /develop-eggs
 /dist
 /bin
 /parts
 /.installed.cfg
+*.pyc
+*.egg-info
 
 # /dataflake/docbuilder/index_template/
 /dataflake/docbuilder/index_template/_build
