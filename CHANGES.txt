@@ -4,6 +4,7 @@ Change log
 1.15 (unreleased)
 -----------------
 - switched documentation to point to the new Git repository
+- use new bootstrap.py script
 
 
 1.14 (2011-11-29)
