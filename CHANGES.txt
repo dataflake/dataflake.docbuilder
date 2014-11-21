@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.16 (unreleased)
+-----------------
+
+
 1.15 (2014-11-21)
 -----------------
 - switched documentation to point to the new Git repository
