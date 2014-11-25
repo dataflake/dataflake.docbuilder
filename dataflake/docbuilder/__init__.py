@@ -92,6 +92,9 @@ class BuildoutScript:
         if self.options.get('output-directory'):
             script_args.extend(['-o', self.options['output-directory'].strip()])
 
+        if self.options.get('copy-output'):
+            script_args.extend(['-c', self.options['copy-output']])
+
         if self.options.get('docs-directory'):
             df = [x.strip() for x in self.options['docs-directory'].split()]
             for doc_folder in df:

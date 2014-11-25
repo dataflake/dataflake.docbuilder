@@ -60,6 +60,12 @@ OPTIONS = (
                       , dest='htmldir'
                       , help='Root folder for HTML output and links (default: $working-directory/html)'
                       ),
+  optparse.make_option( '-c'
+                      , '--copy-output'
+                      , action='store_true'
+                      , dest='copy_output'
+                      , help='Copy all HTML output instead of linking it to the output directory'
+                      ),
   optparse.make_option( '-t'
                       , '--trunk-only'
                       , action='store_true'
@@ -476,7 +482,11 @@ class DocsBuilder(object):
                 shutil.rmtree(html_link_path)
             elif os.path.lexists(html_link_path):
                 os.remove(html_link_path)
-            os.symlink(html_output_folder, html_link_path)
+
+            if self.options.copy_output:
+                shutil.copytree(html_output_folder, html_link_path)
+            else:
+                os.symlink(html_output_folder, html_link_path)
 
 
 LINK_RST = """\
