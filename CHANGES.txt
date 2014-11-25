@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.16 (unreleased)
+1.16 (2014-11-25)
 -----------------
 - added flag ``-c``/``--copy-output`` which will copy instead of link
   all HTML output into the folder designated as HTML output folder.
