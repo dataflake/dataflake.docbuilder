@@ -1,7 +1,6 @@
 ======================
  dataflake.docbuilder
 ======================
-
 This package provides a set of scripts to automate building
 Sphinx-based package documentation for packages hosted on a 
 source code revision control server such as Subversion, 
