@@ -6,7 +6,7 @@ Documentation
 
 :mod:`dataflake.docbuilder` provides a set of scripts to automate 
 building `Sphinx`-based package documentation for packages hosted on 
-a Subversion revision control server.
+a revision control server such as `Git`, `Mercurial` or `Subversion`.
 
 Narrative documentation
 -----------------------
@@ -25,8 +25,7 @@ Support
 -------
 
 If you need commercial support for this software package, please
-contact zetwork GmbH at `http://www.zetwork.com 
-<http://www.zetwork.com/>`_.
+see `http://www.zetwork.com <http://www.zetwork.com/>`_.
 
 Indices and tables
 ------------------
