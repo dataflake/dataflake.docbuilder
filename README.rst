@@ -19,12 +19,11 @@ Git or Mercurial. They will...
 
 Documentation
 =============
-Full documentation for the last released version is at 
-http://packages.python.org/dataflake.docbuilder. For  
-documentation matching the current development version 
-please visit http://docs.dataflake.org/dataflake.docbuilder.
+Full documentation is available at 
+https://dataflakedocbuilder.readthedocs.io/
 
 Bug tracker
 ===========
-A bug tracker is available at https://bugs.launchpad.net/dataflake.docbuilder
+A bug tracker is available at 
+https://github.com/dataflake/dataflake.docbuilder/issues
 

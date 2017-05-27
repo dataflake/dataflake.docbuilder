@@ -26,7 +26,7 @@ NAME = 'dataflake.docbuilder'
 setup(name=NAME,
       version=read('version.txt').strip(),
       description='Automated Sphinx documentation builder',
-      long_description=( read('README.txt') 
+      long_description=( read('README.rst') 
                        + _boundary 
                        + read('CHANGES.txt')
                        + _boundary
