@@ -6,6 +6,8 @@ Change log
 - If output folders don't exist yet create them instead of failing.
 - Use the name ``development`` instead of ``trunk`` or ``head`` to
   designate the current development version in the rendered index page.
+- If a version control URL does not specify which version control
+  system is used, `Git` is now used as default instead of `Subversion`.
 
 
 1.16 (2014-11-25)
