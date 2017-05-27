@@ -12,6 +12,7 @@
 
 # /dataflake/docbuilder/index_template/
 /dataflake/docbuilder/index_template/_build
+dataflake/docbuilder/index_template/*.rst
 
 # /docs/
 /docs/_build
