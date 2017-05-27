@@ -5,6 +5,7 @@
 /develop-eggs
 /dist
 /bin
+build/
 /parts
 /.installed.cfg
 *.pyc
