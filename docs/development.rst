@@ -107,7 +107,8 @@ Making a release
 
 These instructions assume that you have a development sandbox set 
 up using :mod:`zc.buildout` as the scripts used here are generated 
-by the buildout.
+by the buildout. The `twine` package is required for uploading the
+release packages.
 
 The first thing to do when making a release is to check that the ReST
 to be uploaded to PyPI is valid:
@@ -125,7 +126,11 @@ PyPI and upload the Sphinx documentation to PyPI:
 .. code-block:: sh
 
   $ bin/buildout -o
-  $ bin/docpy setup.py sdist register upload upload_sphinx --upload-dir=docs/_build/html
+  $ bin/python setup.py sdist bdist_wheel
+  $ gpg --detach-sign -a dist/dataflake.docbuilder-NNN.tar.gz
+  $ gpg --detach-sign -a dist/dataflake.docbuilder-NNN-py2.py3-none-any.whl
+  $ twine upload dist/dataflake.docbuilder-NNN.tar.gz dist/dataflake.docbuilder-NNN.tar.gz.asc
+  $ twine upload dist/dataflake.docbuilder-NNN-py2.py3-none-any.whl dist/dataflake.docbuilder-NNN-py2.py3-none-any.whl.asc
 
 The ``bin/buildout`` step will make sure the correct package information 
 is used.
