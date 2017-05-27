@@ -3,6 +3,7 @@ Change log
 
 1.17 (unreleased)
 -----------------
+- if output folders don't exist yet create them instead of failing.
 
 
 1.16 (2014-11-25)

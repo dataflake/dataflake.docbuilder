@@ -136,6 +136,11 @@ class DocsBuilder(object):
         self.packages = {}
         self.group_map = {}
 
+        if self.options.verbose:
+            LOG.setLevel(logging.DEBUG)
+        else:
+            LOG.setLevel(logging.WARNING)
+
         if ( not self.options.urls and
              not self.options.z3csphinx_output_directory ):
             parser.error('Please provide package VCS URLs')
@@ -144,26 +149,23 @@ class DocsBuilder(object):
             parser.error('Please provide a workingdir directory path')
 
         if not os.path.isdir(self.options.workingdir):
-            msg = 'Output folder %s does not exist.' % self.options.workingdir
-            parser.error(msg)
+            msg = 'Output folder %s does not exist, creating it...' % (
+                                                    self.options.workingdir)
+            LOG.info(msg)
 
         if not self.options.htmldir:
             self.options.htmldir = os.path.join(self.options.workingdir, 'html')
             if not os.path.isdir(self.options.htmldir):
                 os.mkdir(self.options.htmldir)
         elif not os.path.isdir(self.options.htmldir):
-            msg = 'HTML output folder %s does not exist.' % self.options.htmldir
-            parser.error(msg)
+            msg = 'HTML output folder %s does not exist, creating it...' % (
+                                                        self.options.htmldir)
+            LOG.info(msg)
 
         try:
             self.options.max_tags = int(self.options.max_tags)
         except ValueError:
             paster.error('Please specify a numeric value for --max-tags.')
-
-        if self.options.verbose:
-            LOG.setLevel(logging.DEBUG)
-        else:
-            LOG.setLevel(logging.WARNING)
 
         for group_spec in self.options.groupings or []:
             package_name, group_name = [x.strip() for x in group_spec.split(':')]
