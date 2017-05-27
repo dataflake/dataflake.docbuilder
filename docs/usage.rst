@@ -1,6 +1,5 @@
 Using dataflake.docbuilder
 ==========================
-
 :mod:`dataflake.docbuilder` can be used in two ways. It defines a 
 :term:`Setuptools` entry point called ``docbuilder``, which automatically 
 creates a shell script ``docbuilder`` when the package is installed 
@@ -28,9 +27,9 @@ documentation builder within your buildout configuration file.
     e.g. for credentials, otherwise the script will just hang waiting 
     for input on a prompt you will never see.
 
+
 From :term:`Setuptools`
 -----------------------
-
 After installing :mod:`dataflake.docbuilder` using :term:`Setuptools`,
 a shell script named ``docbuilder`` is created. This can be used to 
 invoke the documentation build process and accepts several options, 
@@ -41,12 +40,12 @@ which you can discover yourself by running ``docbuilder -h`` or
   which can be given multiple times, contains an URL to a package's 
   location in a software version control repository. You can prefix 
   the URL with information about the revision control server used, 
-  if no prefix is given, :term:`Subversion` is assumed::
+  if no prefix is given, :term:`Git` is assumed::
   
     [hg]https://myserver/hg/mypackage
     [git]https://myserver/git/mypackage
     [svn]https://myserver/svn/mypackage
-    https://myserver/svn/myotherpackage
+    https://github.com/organization/myotherpackage.git
 
 * ``-g <GROUP>`` or ``--grouping=<GROUP>``: You can group packages 
   into groups to set them apart in the HTML output. A GROUP element
@@ -69,11 +68,11 @@ which you can discover yourself by running ``docbuilder -h`` or
   package in :term:`Subversion`. If you set this flag only documentation 
   from the development trunk will be built.
 
-* ``-m`` or ``--max-tags``: When building documentation for package 
-  trunks and all tags this flag specifies how many tags to show on 
-  the main index page. If more tags exist, a link to a separate 
-  page is inserted that shows all tags for the given package. The 
-  default value is 5.
+* ``-m`` or ``--max-tags``: When building documentation for the
+  current development version and all tags this flag specifies how many
+  tags to show on the main index page. If more tags exist, a link to a
+  separate page is inserted that shows all tags for the given package.
+  The default value is 5.
 
 * ``-v`` or ``--verbose``: Set the log verbosity. If ``--v`` is 
   specified you will see more detailed logging output. If you 
@@ -95,7 +94,8 @@ which you can discover yourself by running ``docbuilder -h`` or
 * ``--index-name=<NAME>``: The file name, sans extension, for the 
   index file. A ReST source file ``<NAME>.rst`` will be created 
   containing links to the documented packages, and `Sphinx` will 
-  compile it to the final ``<NAME>.html`` output.
+  compile it to the final ``<NAME>.html`` output. The default value
+  is ``index``.
 
 * ``--fallback-css=<PATH>``: Optional path to a CSS file used for
   styling converted ReST output generated from the :term:`setuptools`
@@ -127,11 +127,12 @@ which you can discover yourself by running ``docbuilder -h`` or
 
 If the package to be documented or its `Sphinx` documentation 
 configuration needs additional packages to be imported and run, you 
-need to make them available yourself by e.g. using ``easy_install``.
+need to make them available yourself by e.g. using ``easy_install``
+or by adding them to your :term:`zc.buildout` configuration.
+
 
 From :term:`zc.buildout`
 ------------------------
-
 In a :term:`zc.buildout` configuration file, the 
 :mod:`dataflake.docbuilder` package can be used directly as a recipe.
 The recipe will create a shell script that invokes the document 
@@ -150,7 +151,7 @@ Here's a simple example::
 
 This configuration will create a script named ``docbuilderdocs`` 
 which builds the `Sphinx` documentation found in the 
-:mod:`dataflake.docbuilder` trunk and all development tags.
+:mod:`dataflake.docbuilder` development head and all tags.
 
 The following keywords can be used with this recipe (documentation see
 above):

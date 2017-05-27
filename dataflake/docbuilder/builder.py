@@ -197,7 +197,7 @@ class DocsBuilder(object):
                 rcs_class = SUPPORTED_VCS.get(re_match.groups()[0].lower())
                 package_url = re_match.groups()[1].strip()
             else:
-                rcs_class = SUPPORTED_VCS.get('svn')
+                rcs_class = SUPPORTED_VCS.get('git')
                 package_url = url
 
             if rcs_class is None:
