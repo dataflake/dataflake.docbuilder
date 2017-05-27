@@ -8,6 +8,7 @@ Change log
   designate the current development version in the rendered index page.
 - If a version control URL does not specify which version control
   system is used, `Git` is now used as default instead of `Subversion`.
+- Moved the repository to GitHub and its documentation to ReadTheDocs
 
 
 1.16 (2014-11-25)

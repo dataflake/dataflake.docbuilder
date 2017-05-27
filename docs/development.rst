@@ -4,28 +4,25 @@
 
 Getting the source code
 =======================
-The source code is maintained in the Dataflake Git 
-repository. To check out the trunk:
+The source code is maintained on GitHub. To check out the trunk:
 
 .. code-block:: sh
 
-  $ git clone https://git.dataflake.org/git/dataflake.docbuilder
+  $ git clone https://github.com/dataflake/dataflake.docbuilder.git
 
-You can also browse the code online at 
-http://git.dataflake.org/cgit
+You can also browse the code online at
+https://github.com/dataflake/dataflake.docbuilder
 
 
 Bug tracker
 ===========
 For bug reports, suggestions or questions please use the 
-Launchpad bug tracker at 
-`https://bugs.launchpad.net/dataflake.docbuilder 
-<https://bugs.launchpad.net/dataflake.docbuilder>`_.
+GitHub bug tracker at 
+https://github.com/dataflake/dataflake.docbuilder/issues.
 
 
 Sharing Your Changes
 ====================
-
 If you got a read-only checkout from the Git repository, and you
 have made a change you would like to share, the best route is to let
 Git help you make a patch file:
@@ -40,7 +37,6 @@ report.
 
 Building the documentation in a ``virtualenv``
 ==============================================
-
 :mod:`dataflake.docbuilder` uses the nifty :mod:`Sphinx` documentation system
 for building its docs. If you use the ``virtualenv`` package to create 
 lightweight Python development environments, you can build the documentation 
@@ -73,7 +69,6 @@ Now you can build the documentation:
 
 Building the documentation using :mod:`zc.buildout`
 ===================================================
-
 :mod:`dataflake.docbuilder` ships with its own :file:`buildout.cfg` file and
 :file:`bootstrap.py` for setting up a development buildout:
 
@@ -104,24 +99,10 @@ to build the documentation, including testing its code snippets:
 
 Making a release
 ================
-
 These instructions assume that you have a development sandbox set 
 up using :mod:`zc.buildout` as the scripts used here are generated 
 by the buildout. The `twine` package is required for uploading the
 release packages.
-
-The first thing to do when making a release is to check that the ReST
-to be uploaded to PyPI is valid:
-
-.. code-block:: sh
-
-  $ bin/docpy setup.py --long-description | bin/rst2 html \
-    --link-stylesheet \
-    --stylesheet=http://www.python.org/styles/styles.css > build/desc.html
-
-Once you're certain everything is as it should be, the following will
-build the distribution, upload it to PyPI, register the metadata with
-PyPI and upload the Sphinx documentation to PyPI:
 
 .. code-block:: sh
 

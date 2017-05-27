@@ -147,7 +147,7 @@ Here's a simple example::
   eggs =  
       repoze.sphinx.autointerface
   sources =
-      http://svn.dataflake.org/svn/dataflake.docbuilder
+      https://github.com/dataflake/dataflake.docbuilder.git
 
 This configuration will create a script named ``docbuilderdocs`` 
 which builds the `Sphinx` documentation found in the 

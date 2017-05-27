@@ -1,10 +1,8 @@
 Installation
 ============
 
-You will need `Python <http://python.org>`_ version 2.4 or better to
-run :mod:`dataflake.docbuilder`.  Development of 
-:mod:`dataflake.docbuilder` is done primarily under Python 2.7, so 
-that version is recommended.
+You will need `Python <http://python.org>`_ version 2.7 or better to
+run :mod:`dataflake.docbuilder`.
 
 .. warning:: 
 
