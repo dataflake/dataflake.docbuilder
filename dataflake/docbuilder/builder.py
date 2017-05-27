@@ -276,7 +276,9 @@ class DocsBuilder(object):
                                                                )
                                }
                     if tag_name == self.options.trunk_name:
+                        tag_data['package_tag'] = 'development'
                         tag_data['package_tag_path'] = package_name
+
                         if self.options.trunk_only:
                             tag_data['package_tag'] = ''
 
