@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.18 (unreleased)
+-----------------
+
+
 1.17 (2017-05-27)
 -----------------
 - If output folders don't exist yet create them instead of failing.
