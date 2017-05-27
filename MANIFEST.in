@@ -1,0 +1,10 @@
+include *.cfg
+include *.py
+include *.rst
+include *.txt
+exclude .*.cfg
+
+recursive-include dataflake *
+
+global-exclude *.pyc
+global-exclude *.pyo
