@@ -81,10 +81,11 @@ which you can discover yourself by running ``docbuilder -h`` or
   output will be shown as well.
 
 * ``--index-template=<PATH>``: This optional parameter contains a 
-  filesystem path to a folder containing a `Sphinx` configuration and 
-  templates/static files. If you provide such a path 
-  :mod:`dataflake.docbuilder` will use it to build additional content 
-  for the ``output-directory`` folder and auto-generate an index file. 
+  filesystem path to a folder containing a `Sphinx` configuration 
+  (a ``conf.py`` file) and templates/static files. If you provide such
+  a path :mod:`dataflake.docbuilder` will use it to build additional
+  content for the ``output-directory`` folder and auto-generate an
+  index file.  
   Please note: This folder must not contain an ``index.rst`` document, 
   as the index file will be auto-generated during the documentation 
   build process. You can optionally provide a template named 
