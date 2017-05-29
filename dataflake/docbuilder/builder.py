@@ -13,9 +13,9 @@
 """ The documentation builder class
 """
 
-import cStringIO
 from docutils.core import publish_file
 from docutils.utils import SystemMessage
+from io import StringIO
 import logging
 import optparse
 import os
@@ -205,16 +205,15 @@ class DocsBuilder(object):
 
     def create_index_html(self):
         index_text = ''
-        group_names = self.group_map.keys()
-        group_names.sort(key=str.lower)
+        group_names = sorted(self.group_map.keys(), key=str.lower)
         output = {'package': PACKAGE_RST,
                   'link': LINK_RST,
                   'nolink': NOLINK_RST,
                   'groupheader': GROUPHEADER_RST}
 
         for group_name in group_names:
-            package_names = self.group_map.get(group_name)
-            package_names.sort(key=str.lower)
+            package_names = sorted(self.group_map.get(group_name),
+                                   key=str.lower)
 
             if group_name or (not group_name and len(group_names) > 1):
                 group_name = group_name or 'Ungrouped'
@@ -224,9 +223,9 @@ class DocsBuilder(object):
 
             for package_name in package_names:
                 tags_list = []
-                tag_names = self.packages[package_name].keys()
-                tag_names.sort(key=pkg_resources.parse_version)
-                tag_names.reverse()
+                tag_names = sorted(self.packages[package_name].keys(),
+                                   key=pkg_resources.parse_version,
+                                   reverse=True)
 
                 # Make sure trunk stays at the top
                 if self.options.trunk_name in tag_names:
@@ -343,7 +342,7 @@ class DocsBuilder(object):
             if os.path.isfile(self.options.fallback_css):
                 settings = {'stylesheet_path': self.options.fallback_css}
             try:
-                publish_file(source=cStringIO.StringIO(rst),
+                publish_file(source=StringIO(rst),
                              writer_name='html',
                              destination_path=output_path,
                              settings_overrides=settings)
@@ -359,7 +358,7 @@ class DocsBuilder(object):
     def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
 
-        for tag in self.packages[package_name]:
+        for tag in list(self.packages[package_name]):
             tag_folder = os.path.join(package_path, tag)
             doc_folder = None
             for folder_name in self.options.docs_folders:
@@ -421,11 +420,11 @@ class DocsBuilder(object):
                     LOG.info('Sphinx build generated %s warnings/errors.' % w)
                 self.packages[package_name][tag] = html_output_folder
                 sys.path = old_sys_path
-            except pkg_resources.DistributionNotFound, e:
+            except pkg_resources.DistributionNotFound as e:
                 msg = 'Building Sphinx docs for %s %s failed: missing \
                        dependency %s'
                 LOG.error(msg % (package_name, tag, str(e)))
-            except IndexError, e:
+            except IndexError as e:
                 msg = 'Building Sphinx docs for %s %s failed: %s'
                 LOG.error(msg % (package_name, tag, str(e)))
 

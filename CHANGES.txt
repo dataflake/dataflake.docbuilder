@@ -3,6 +3,7 @@ Change log
 
 1.19 (unreleased)
 -----------------
+- Python 3 compatibility
 
 
 1.18 (2017-05-29)

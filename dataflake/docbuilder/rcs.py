@@ -15,8 +15,8 @@
 
 import logging
 import os
+from six.moves.urllib.parse import urlparse
 import sys
-import urlparse
 
 from dataflake.docbuilder.utils import shell_cmd
 
@@ -86,7 +86,7 @@ class RCSClient(object):
     def name_from_url(self, url):
         """ Determine a package name from its VCS URL
         """
-        parsed_url = urlparse.urlparse(url)
+        parsed_url = urlparse(url)
         return [x for x in parsed_url[2].split('/') if x][-1]
 
     def checkout(self, url, targetpath):
@@ -129,8 +129,7 @@ class HGClient(RCSClient):
             tag, revision = line.split()
             if tag != 'tip':
                 tags.append(tag)
-        tags.sort()
-        return tags
+        return sorted(tags)
 
 
 class GitClient(RCSClient):
@@ -160,8 +159,7 @@ class GitClient(RCSClient):
         if output:
             for line in output.split('\n'):
                 tags.append(line.strip())
-            tags.sort()
-        return tags
+        return sorted(tags)
 
 
 class SVNClient(RCSClient):
@@ -187,5 +185,4 @@ class SVNClient(RCSClient):
         """
         cmd = 'svn ls %s/%s' % (url, self.tags_name)
         tag_names = [x.replace('/', '') for x in shell_cmd(cmd).split()]
-        tag_names.sort()
-        return tag_names
+        return sorted(tag_names)

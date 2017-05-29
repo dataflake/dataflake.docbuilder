@@ -13,16 +13,24 @@
 """ Shared utility functions
 """
 
-import commands
 import os
+import six
+import subprocess
 
 
 def shell_cmd(cmd, fromwhere=None):
     cwd = os.getcwd()
     if fromwhere:
         os.chdir(fromwhere)
-    status, output = commands.getstatusoutput(cmd)
+
+    try:
+        output = subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        output = e.output
+        print('%s: %s' % (cmd, output))
+
+    if six.PY3 and isinstance(output, bytes):
+        output = output.decode('UTF-8')
+
     os.chdir(cwd)
-    if status:
-        print '%s: %s' % (cmd, output)
     return output
