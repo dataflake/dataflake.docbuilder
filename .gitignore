@@ -2,6 +2,7 @@
 # /
 /eggs
 /.eggs
+.tox
 /develop-eggs
 /dist
 /bin

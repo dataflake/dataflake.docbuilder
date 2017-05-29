@@ -3,6 +3,7 @@ Change log
 
 1.18 (unreleased)
 -----------------
+- added tox configuration to do PEP-8 checking cia ``flake8``
 
 
 1.17 (2017-05-27)
