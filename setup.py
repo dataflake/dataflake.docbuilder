@@ -12,26 +12,24 @@
 ##############################################################################
 
 import os
-import sys
 
 from setuptools import find_packages
 from setuptools import setup
 
+
+_boundary = '\n' + ('-' * 60) + '\n\n'
+_dl = 'Download\n========'
+NAME = 'dataflake.docbuilder'
+
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-_boundary = '\n' + ('-' * 60) + '\n\n'
-NAME = 'dataflake.docbuilder'
 
 setup(name=NAME,
       version=read('version.txt').strip(),
       description='Automated Sphinx documentation builder',
-      long_description=( read('README.rst') 
-                       + _boundary 
-                       + read('CHANGES.txt')
-                       + _boundary
-                       + "Download\n========"
-                       ),
+      long_description=(read('README.rst') + _boundary + _dl),
       classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -58,9 +56,8 @@ setup(name=NAME,
         'zc.recipe.egg',
         ],
       zip_safe=False,
-      entry_points = {
+      entry_points={
           'console_scripts': ['docbuilder = %s:run_builder' % NAME],
           'zc.buildout': ['default=%s:BuildoutScript' % NAME]
         },
       )
-

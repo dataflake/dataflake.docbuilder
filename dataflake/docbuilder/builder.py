@@ -36,100 +36,73 @@ SUPPORTED_VCS = {'svn': SVNClient, 'git': GitClient, 'hg': HGClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (
-  optparse.make_option( '-s'
-                      , '--source'
-                      , action='append'
-                      , dest='urls'
-                      , help='VCS URL (can be used multiple times)'
-                      ),
-  optparse.make_option( '-g'
-                      , '--grouping'
-                      , action='append'
-                      , dest='groupings'
-                      , help='Package name to group name grouping, colon-separated'
-                      ),
-  optparse.make_option( '-w'
-                      , '--working-directory'
-                      , action='store'
-                      , dest='workingdir'
-                      , help='working directory for package checkouts'
-                      ),
-  optparse.make_option( '-o'
-                      , '--output-directory'
-                      , action='store'
-                      , dest='htmldir'
-                      , help='Root folder for HTML output and links (default: $working-directory/html)'
-                      ),
-  optparse.make_option( '-c'
-                      , '--copy-output'
-                      , action='store_true'
-                      , dest='copy_output'
-                      , help='Copy all HTML output instead of linking it to the output directory'
-                      ),
-  optparse.make_option( '-t'
-                      , '--trunk-only'
-                      , action='store_true'
-                      , dest='trunk_only'
-                      , help='Only build trunk documentation? (default: False)'
-                      , default=False
-                      ),
-  optparse.make_option( '-m'
-                      , '--max-tags'
-                      , action='store'
-                      , dest='max_tags'
-                      , help='Max number of tags to show on the index page. If the value is "0" or "1", only the trunk is build. Default: 5'
-                      , default=5
-                      ),
-  optparse.make_option( '-v'
-                      , '--verbose'
-                      , action='count'
-                      , dest='verbose'
-                      , help='Log verbosity'
-                      ),
-  optparse.make_option( '--index-template'
-                      , action='store'
-                      , dest='index_template'
-                      , help='Optional filesystem path containing Sphinx files for the output directory'
-                      ),
-  optparse.make_option( '--index-name'
-                      , action='store'
-                      , dest='index_name'
-                      , help='The index file name, without extension. Defaults to "index".'
-                      , default='index'
-                      ),
-  optparse.make_option( '--fallback-css'
-                      , action='store'
-                      , dest='fallback_css'
-                      , help='Path to a CSS file with styles used for plain ReST documentation'
-                      ),
-  optparse.make_option( '--docs-directory'
-                      , action='append'
-                      , dest='docs_folders'
-                      , help='Sphinx documentation folder name (can be used multiple times, default: "doc" and "docs")'
-                      , default=['doc', 'docs']
-                      ),
-  optparse.make_option( '--trunk-directory'
-                      , action='store'
-                      , dest='trunk_name'
-                      , help='Development trunk container name (default: "trunk")'
-                      , default='trunk'
-                      ),
-  optparse.make_option( '--tags-directory'
-                      , action='store'
-                      , dest='tags_name'
-                      , help='Development tags container name (default: "tags")'
-                      , default='tags'
-                      ),
-  optparse.make_option( '--z3csphinx-output-directory'
-                      , action='store'
-                      , dest='z3csphinx_output_directory'
-                      , help='Root folder for z3c.recipe.sphinx-generated documentation'
-                      ),
+  optparse.make_option('-s', '--source',
+                       action='append', dest='urls',
+                       help='VCS URL (can be used multiple times)'),
+  optparse.make_option('-g', '--grouping',
+                       action='append', dest='groupings',
+                       help='Package name to group name map, colon-separated'),
+  optparse.make_option('-w', '--working-directory',
+                       action='store', dest='workingdir',
+                       help='working directory for package checkouts'),
+  optparse.make_option('-o', '--output-directory',
+                       action='store', dest='htmldir',
+                       help='Root folder for HTML output and links (default: \
+                             $working-directory/html)'),
+  optparse.make_option('-c', '--copy-output',
+                       action='store_true', dest='copy_output',
+                       help='Copy all HTML output instead of linking it to \
+                             the output directory'),
+  optparse.make_option('-t', '--trunk-only',
+                       action='store_true', dest='trunk_only',
+                       help='Only build trunk documentation? (default: False)',
+                       default=False),
+  optparse.make_option('-m', '--max-tags',
+                       action='store', dest='max_tags',
+                       help='Max number of tags to show on the index page. \
+                             If the value is "0" or "1", only the trunk is \
+                             built. Default: 5',
+                       default=5),
+  optparse.make_option('-v', '--verbose',
+                       action='count', dest='verbose',
+                       help='Log verbosity'),
+  optparse.make_option('--index-template',
+                       action='store', dest='index_template',
+                       help='Optional filesystem path containing Sphinx files \
+                             for the output directory'),
+  optparse.make_option('--index-name',
+                       action='store', dest='index_name',
+                       help='The index file name, without extension. Defaults \
+                             to "index".',
+                       default='index'),
+  optparse.make_option('--fallback-css',
+                       action='store', dest='fallback_css',
+                       help='Path to a CSS file with styles used for plain \
+                             ReST documentation'),
+  optparse.make_option('--docs-directory',
+                       action='append', dest='docs_folders',
+                       help='Sphinx documentation folder name (can be used \
+                             multiple times, default: "doc" and "docs")',
+                       default=['doc', 'docs']),
+  optparse.make_option('--trunk-directory',
+                       action='store', dest='trunk_name',
+                       help='Development trunk container name \
+                             (default: "trunk")',
+                       default='trunk'),
+  optparse.make_option('--tags-directory',
+                       action='store', dest='tags_name',
+                       help='Development tags container name \
+                             (default: "tags")',
+                       default='tags'),
+  optparse.make_option('--z3csphinx-output-directory',
+                       action='store', dest='z3csphinx_output_directory',
+                       help='Root folder for z3c.recipe.sphinx-generated \
+                             documentation'),
 )
 
 
 class DocsBuilder(object):
-    
+
     def __init__(self):
         parser = optparse.OptionParser(option_list=OPTIONS)
         self.options, self.args = parser.parse_args()
@@ -141,34 +114,34 @@ class DocsBuilder(object):
         else:
             LOG.setLevel(logging.WARNING)
 
-        if ( not self.options.urls and
-             not self.options.z3csphinx_output_directory ):
+        if not self.options.urls and \
+           not self.options.z3csphinx_output_directory:
             parser.error('Please provide package VCS URLs')
 
         if not self.options.workingdir:
             parser.error('Please provide a workingdir directory path')
 
         if not os.path.isdir(self.options.workingdir):
-            msg = 'Output folder %s does not exist, creating it...' % (
-                                                    self.options.workingdir)
+            msg = 'Creating output folder %s...' % self.options.workingdir
             LOG.info(msg)
 
         if not self.options.htmldir:
-            self.options.htmldir = os.path.join(self.options.workingdir, 'html')
+            self.options.htmldir = os.path.join(self.options.workingdir,
+                                                'html')
             if not os.path.isdir(self.options.htmldir):
                 os.mkdir(self.options.htmldir)
         elif not os.path.isdir(self.options.htmldir):
-            msg = 'HTML output folder %s does not exist, creating it...' % (
-                                                        self.options.htmldir)
+            msg = 'Creating HTML output folder %s...' % self.options.htmldir
             LOG.info(msg)
 
         try:
             self.options.max_tags = int(self.options.max_tags)
         except ValueError:
-            paster.error('Please specify a numeric value for --max-tags.')
+            LOG.error('Please specify a numeric value for --max-tags.')
 
         for group_spec in self.options.groupings or []:
-            package_name, group_name = [x.strip() for x in group_spec.split(':')]
+            package_name, group_name = [x.strip() for x in
+                                        group_spec.split(':')]
             group_values = self.group_map.setdefault(group_name, [])
             group_values.append(package_name)
 
@@ -177,15 +150,13 @@ class DocsBuilder(object):
             root_pkgs = os.listdir(self.options.z3csphinx_output_directory)
 
             for pkg_name in root_pkgs:
-                pkg_docs = os.path.join( self.options.z3csphinx_output_directory
-                                       , pkg_name
-                                       , 'build'
-                                       , pkg_name
-                                       )
+                zod = self.options.z3csphinx_output_directory
+                pkg_docs = os.path.join(zod, pkg_name, 'build', pkg_name)
                 self.z3csphinx_packages[pkg_name] = pkg_docs
 
                 if not self.options.urls:
-                    self.packages[pkg_name] = {self.options.trunk_name: pkg_docs}
+                    self.packages[pkg_name] = \
+                        {self.options.trunk_name: pkg_docs}
 
     def run(self):
         grouped = []
@@ -204,17 +175,14 @@ class DocsBuilder(object):
                 LOG.warning('Unsupported VCS URL, ignoring: %s' % url)
                 continue
 
-            rcs = rcs_class( self.options.trunk_name
-                           , self.options.tags_name
-                           , logger=LOG
-                           )
+            rcs = rcs_class(self.options.trunk_name,
+                            self.options.tags_name, logger=LOG)
             package_name = rcs.name_from_url(package_url)
             if package_name not in self.z3csphinx_packages:
                 LOG.info('Checking out %s' % package_url)
-                info = rcs.checkout_or_update( package_url
-                                             , self.options.workingdir
-                                             , self.options.trunk_only
-                                             )
+                info = rcs.checkout_or_update(package_url,
+                                              self.options.workingdir,
+                                              self.options.trunk_only)
             else:
                 info = {}
 
@@ -239,11 +207,10 @@ class DocsBuilder(object):
         index_text = ''
         group_names = self.group_map.keys()
         group_names.sort(key=str.lower)
-        output = { 'package': PACKAGE_RST
-                 , 'link': LINK_RST
-                 , 'nolink': NOLINK_RST
-                 , 'groupheader': GROUPHEADER_RST
-                 }
+        output = {'package': PACKAGE_RST,
+                  'link': LINK_RST,
+                  'nolink': NOLINK_RST,
+                  'groupheader': GROUPHEADER_RST}
 
         for group_name in group_names:
             package_names = self.group_map.get(group_name)
@@ -251,9 +218,8 @@ class DocsBuilder(object):
 
             if group_name or (not group_name and len(group_names) > 1):
                 group_name = group_name or 'Ungrouped'
-                group_data = { 'group_name': group_name
-                             , 'group_underline': '=' * len(group_name)
-                             }
+                group_data = {'group_name': group_name,
+                              'group_underline': '=' * len(group_name)}
                 index_text += output['groupheader'] % group_data
 
             for package_name in package_names:
@@ -269,12 +235,10 @@ class DocsBuilder(object):
 
                 for tag_name in tag_names:
                     html_output_folder = self.packages[package_name][tag_name]
-                    tag_data = { 'package_name': package_name
-                               , 'package_tag': tag_name
-                               , 'package_tag_path': '%s-%s' % ( package_name
-                                                               , tag_name
-                                                               )
-                               }
+                    ptp = '%s-%s' % (package_name, tag_name)
+                    tag_data = {'package_name': package_name,
+                                'package_tag': tag_name,
+                                'package_tag_path': ptp}
                     if tag_name == self.options.trunk_name:
                         tag_data['package_tag'] = 'development'
                         tag_data['package_tag_path'] = package_name
@@ -292,38 +256,34 @@ class DocsBuilder(object):
                 if self.options.trunk_only:
                     index_text += '%s\n' % tags_list[0]
                 else:
+                    underline = '_' * len(package_name)
                     if len(tags_list) > self.options.max_tags:
                         index_tags = tags_list[:self.options.max_tags]
                         more_link = MORE_RST % {'package_name': package_name}
                     else:
                         index_tags = tags_list[:]
                         more_link = ''
-                    p_data = { 'package_name': package_name
-                             , 'package_output': '\n'.join(index_tags)
-                             , 'package_name_underline': '_' * len(package_name)
-                             }
+                    p_data = {'package_name': package_name,
+                              'package_output': '\n'.join(index_tags),
+                              'package_name_underline': underline}
                     index_text += output['package'] % p_data
                     index_text += more_link
 
                     # Create separate per-package page
-                    pkg_file_path = os.path.join( self.options.index_template
-                                                , '%s.rst' % package_name
-                                                )
+                    pkg_file_path = os.path.join(self.options.index_template,
+                                                 '%s.rst' % package_name)
                     package_file = open(pkg_file_path, 'w')
-                    pkg_data = { 'package_name': package_name
-                               , 'package_output': '\n'.join(tags_list)
-                               , 'package_name_underline': '=' * len(package_name)
-                               }
+                    pkg_data = {'package_name': package_name,
+                                'package_output': '\n'.join(tags_list),
+                                'package_name_underline': underline}
                     package_file.write(':orphan:\n\n')
                     package_file.write(output['package'] % pkg_data)
                     package_file.close()
 
-        index_path = os.path.join( self.options.index_template
-                                 , '%s.rst' % self.options.index_name
-                                 )
-        template_path = os.path.join( self.options.index_template
-                                    , '%s.rst.in' % self.options.index_name
-                                    )
+        index_path = os.path.join(self.options.index_template,
+                                  '%s.rst' % self.options.index_name)
+        template_path = os.path.join(self.options.index_template,
+                                     '%s.rst.in' % self.options.index_name)
         if os.path.isfile(template_path):
             template_file = open(template_path, 'r')
             template_text = template_file.read()
@@ -350,18 +310,17 @@ class DocsBuilder(object):
             tmp_index.close()
 
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
-        builder = Sphinx( self.options.index_template
-                        , self.options.index_template
-                        , self.options.htmldir
-                        , dt
-                        , 'html'
-                        , {}
-                        , None
-                        , warning=sys.stderr
-                        , freshenv=False
-                        , warningiserror=False
-                        , tags=None
-                        )
+        builder = Sphinx(self.options.index_template,
+                         self.options.index_template,
+                         self.options.htmldir,
+                         dt,
+                         'html',
+                         {},
+                         None,
+                         warning=sys.stderr,
+                         freshenv=False,
+                         warningiserror=False,
+                         tags=None)
         builder.build(True, None)
 
     def _build_simple_rst(self, package_name, tag_name):
@@ -384,19 +343,18 @@ class DocsBuilder(object):
             if os.path.isfile(self.options.fallback_css):
                 settings = {'stylesheet_path': self.options.fallback_css}
             try:
-                publish_file( source=cStringIO.StringIO(rst)
-                            , writer_name='html'
-                            , destination_path=output_path
-                            , settings_overrides=settings
-                            )
+                publish_file(source=cStringIO.StringIO(rst),
+                             writer_name='html',
+                             destination_path=output_path,
+                             settings_overrides=settings)
                 self.packages[package_name][tag_name] = build_folder
                 msg = 'Building simple ReST docs for %s %s.'
                 LOG.info(msg % (package_name, tag_name))
-            except SystemMessage, e:
+            except SystemMessage as e:
                 msg = 'Building simple ReST doc for %s %s failed!'
                 LOG.error(msg % (package_name, tag_name))
+                LOG.error(str(e))
                 pass
-
 
     def build_html(self, package_name):
         package_path = os.path.join(self.options.workingdir, package_name)
@@ -406,8 +364,8 @@ class DocsBuilder(object):
             doc_folder = None
             for folder_name in self.options.docs_folders:
                 doc_candidate = os.path.join(tag_folder, folder_name)
-                if ( os.path.isdir(doc_candidate) and 
-                     os.path.isfile(os.path.join(doc_candidate, 'conf.py')) ):
+                if os.path.isdir(doc_candidate) and \
+                   os.path.isfile(os.path.join(doc_candidate, 'conf.py')):
                     doc_folder = doc_candidate
                     break
 
@@ -428,7 +386,8 @@ class DocsBuilder(object):
                     dirs.remove('.svn')
                 for dir_name in dirs:
                     path = os.path.join(root, dir_name)
-                    distributions.extend(pkg_resources.find_distributions(path))
+                    found = pkg_resources.find_distributions(path)
+                    distributions.extend(found)
 
             for distribution in distributions:
                 distribution.activate()
@@ -443,27 +402,28 @@ class DocsBuilder(object):
                 output_pipeline = None
 
             try:
-                builder = Sphinx( doc_folder
-                                , doc_folder
-                                , html_output_folder
-                                , os.path.join(build_folder, 'doctrees')
-                                , 'html'
-                                , {}
-                                , None
-                                , warning=output_pipeline
-                                , freshenv=False
-                                , warningiserror=False
-                                , tags=None
-                                )
-                LOG.info('Building Sphinx docs for %s %s' % (package_name, tag))
+                builder = Sphinx(doc_folder,
+                                 doc_folder,
+                                 html_output_folder,
+                                 os.path.join(build_folder, 'doctrees'),
+                                 'html',
+                                 {},
+                                 None,
+                                 warning=output_pipeline,
+                                 freshenv=False,
+                                 warningiserror=False,
+                                 tags=None)
+                LOG.info('Building Sphinx docs for %s %s' % (
+                            package_name, tag))
                 builder.build(True, None)
-                warnings = getattr(builder, '_warncount', 0)
-                if warnings:
-                    LOG.info('Sphinx build generated %s warnings/errors.' % warnings)
+                w = getattr(builder, '_warncount', 0)
+                if w:
+                    LOG.info('Sphinx build generated %s warnings/errors.' % w)
                 self.packages[package_name][tag] = html_output_folder
                 sys.path = old_sys_path
             except pkg_resources.DistributionNotFound, e:
-                msg = 'Building Sphinx docs for %s %s failed: missing dependency %s'
+                msg = 'Building Sphinx docs for %s %s failed: missing \
+                       dependency %s'
                 LOG.error(msg % (package_name, tag, str(e)))
             except IndexError, e:
                 msg = 'Building Sphinx docs for %s %s failed: %s'

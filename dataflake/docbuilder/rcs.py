@@ -25,20 +25,13 @@ class RCSClient(object):
     """ RCS client base class.
     """
 
-    def __init__( self
-                , trunk_name='trunk'
-                , tags_name='tags'
-                , logger=logging.getLogger()
-                ):
+    def __init__(self, trunk_name='trunk', tags_name='tags',
+                 logger=logging.getLogger()):
         self.trunk_name = trunk_name
         self.tags_name = tags_name
         self.logger = logger
 
-    def checkout_or_update( self
-                          , url
-                          , workingdir
-                          , trunk_only=True
-                          ):
+    def checkout_or_update(self, url, workingdir, trunk_only=True):
         package_info = {}
         package_name = self.name_from_url(url)
         package_dir = os.path.join(workingdir, package_name)
@@ -77,8 +70,8 @@ class RCSClient(object):
                 self.checkout_tag(package_url, tag, tag_path)
                 self.activate_egg(tag_path)
             else:
-                 msg = 'Already checked out: %s %s' % (package_name, tag)
-                 self.logger.info(msg)
+                msg = 'Already checked out: %s %s' % (package_name, tag)
+                self.logger.info(msg)
 
         return tag_names
 
@@ -114,8 +107,8 @@ class HGClient(RCSClient):
     def update(self, checkout_path):
         """ Update an existing checkout
         """
-        shell_cmd('hg pull -u', fromwhere=checkout_path)       
-    
+        shell_cmd('hg pull -u', fromwhere=checkout_path)
+
     def checkout(self, url, checkout_path):
         """ Check out from a repository
         """
@@ -139,13 +132,14 @@ class HGClient(RCSClient):
         tags.sort()
         return tags
 
+
 class GitClient(RCSClient):
 
     def update(self, checkout_path):
         """ Update an existing checkout
         """
-        shell_cmd('git pull -a', fromwhere=checkout_path)       
-    
+        shell_cmd('git pull -a', fromwhere=checkout_path)
+
     def checkout(self, url, checkout_path):
         """ Check out from a repository
         """
@@ -195,4 +189,3 @@ class SVNClient(RCSClient):
         tag_names = [x.replace('/', '') for x in shell_cmd(cmd).split()]
         tag_names.sort()
         return tag_names
-
