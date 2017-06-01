@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.20 (unreleased)
+1.20 (2017-06-01)
 -----------------
 - use pkgutil-style namespace declaration
 - package cleanup (``.gitignore``, ``MANIFEST.in``, ``README.rst``)
