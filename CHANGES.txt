@@ -1,12 +1,13 @@
 Change log
-
-1.9 (unreleased)
-----------------
-
 ==========
 
 1.20 (unreleased)
 -----------------
+- use pkgutil-style namespace declaration
+- package cleanup (``.gitignore``, ``MANIFEST.in``, ``README.rst``)
+- docs cleanup (``Makefile``, ``conf.py``)
+- tests cleanup (``tox.ini``, ``.travis.yml``)
+- remove unsupported documentation bits
 
 
 1.19 (2017-05-29)
