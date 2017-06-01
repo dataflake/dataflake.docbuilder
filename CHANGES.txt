@@ -6,7 +6,7 @@ Change log
 - use pkgutil-style namespace declaration
 - package cleanup (``.gitignore``, ``MANIFEST.in``, ``README.rst``)
 - docs cleanup (``Makefile``, ``conf.py``)
-- tests cleanup (``tox.ini``, ``.travis.yml``)
+- tests cleanup (``tox.ini``)
 - remove unsupported documentation bits
 
 
