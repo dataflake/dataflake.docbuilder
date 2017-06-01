@@ -1,20 +1,20 @@
-
-# /
-/eggs
-/.eggs
-.tox
-/develop-eggs
-/dist
-/bin
-build/
-/parts
-/.installed.cfg
-*.pyc
 *.egg-info
-
-# /dataflake/docbuilder/index_template/
-/dataflake/docbuilder/index_template/_build
-dataflake/docbuilder/index_template/*.rst
-
-# /docs/
-/docs/_build
+*.pyc
+*.pyo
+*$py.class
+*.so
+__pycache__
+.coverage
+.installed.cfg
+.mr.developer.cfg
+nosetests.xml
+coverage.xml
+.eggs/
+.tox/
+bin/
+build/
+eggs/
+develop-eggs/
+dist/
+docs/_build/
+parts/

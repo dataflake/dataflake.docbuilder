@@ -23,7 +23,8 @@ NAME = 'dataflake.docbuilder'
 
 
 def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    with open(os.path.join(os.path.dirname(__file__), *rnames)) as f:
+        return f.read()
 
 
 setup(name=NAME,
@@ -48,7 +49,7 @@ setup(name=NAME,
       keywords='sphinx documentation',
       author="Jens Vagelpohl and contributors",
       author_email="jens@dataflake.org",
-      url="http://pypi.python.org/pypi/%s" % NAME,
+      url="https://github.com/dataflake/%s" % NAME,
       license="ZPL 2.1",
       packages=find_packages(),
       include_package_data=True,
@@ -61,7 +62,7 @@ setup(name=NAME,
         ],
       zip_safe=False,
       entry_points={
-          'console_scripts': ['docbuilder = %s:run_builder' % NAME],
-          'zc.buildout': ['default=%s:BuildoutScript' % NAME]
+        'console_scripts': ['docbuilder = %s:run_builder' % NAME],
+        'zc.buildout': ['default=%s:BuildoutScript' % NAME]
         },
       )
