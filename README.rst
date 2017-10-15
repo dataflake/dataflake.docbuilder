@@ -1,3 +1,15 @@
+.. image:: https://readthedocs.org/projects/dataflakedocbuilder/badge/?version=latest
+   :target: https://dataflakedocbuilder.readthedocs.io
+   :alt: Documentation Status
+
+.. image:: https://img.shields.io/pypi/v/dataflake.docbuilder.svg
+   :target: https://pypi.python.org/pypi/dataflake.docbuilder
+   :alt: PyPI
+
+.. image:: https://img.shields.io/pypi/pyversions/dataflake.docbuilder.svg
+   :target: https://pypi.python.org/pypi/dataflake.docbuilder
+   :alt: Python versions
+
 ======================
  dataflake.docbuilder
 ======================
