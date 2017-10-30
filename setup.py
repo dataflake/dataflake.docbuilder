@@ -17,8 +17,6 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-_boundary = '\n' + ('-' * 60) + '\n\n'
-_dl = 'Download\n========'
 NAME = 'dataflake.docbuilder'
 
 
@@ -30,7 +28,7 @@ def read(*rnames):
 setup(name=NAME,
       version=read('version.txt').strip(),
       description='Automated Sphinx documentation builder',
-      long_description=(read('README.rst') + _boundary + _dl),
+      long_description=read('README.rst'),
       classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
