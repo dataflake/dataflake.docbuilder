@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.21 (unreleased)
+1.21 (2018-06-29)
 -----------------
 - test and declare support for Python 3.7
 
