@@ -1,7 +1,7 @@
 Change log
 ==========
 
-1.22 (unreleased)
+1.22 (2018-07-22)
 -----------------
 - add option ``-n`` to skip checkout and build of software packages
 
