@@ -40,7 +40,8 @@ class BuildoutScript:
             options['sources'] = ''
 
         if not options.get('sources') and \
-           not options.get('z3csphinx-output-directory'):
+           not options.get('z3csphinx-output-directory') and \
+           not options.get('no-packages'):
             msg = 'Missing parameter: source (Version control URLs).'
             raise zc.buildout.UserError(msg)
 
@@ -122,6 +123,9 @@ class BuildoutScript:
         else:
             index_template = os.path.join(self.sw_path, 'index_template')
         script_args.extend(['--index-template', index_template])
+
+        if self.options.get('no-packages'):
+            script_args.extend(['--no-packages'])
 
         if self.options.get('index-name'):
             script_args.extend(['--index-name', self.options['index-name']])

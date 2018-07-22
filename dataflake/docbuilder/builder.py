@@ -63,6 +63,11 @@ OPTIONS = (
                              If the value is "0" or "1", only the trunk is \
                              built. Default: 5',
                        default=5),
+  optparse.make_option('-n', '--no-packages',
+                       action='store_true', dest='no_packages',
+                       help='Do not check out and build any package \
+                             documentation. Default: False.',
+                       default=False),
   optparse.make_option('-v', '--verbose',
                        action='count', dest='verbose',
                        help='Log verbosity'),
@@ -115,7 +120,8 @@ class DocsBuilder(object):
             LOG.setLevel(logging.WARNING)
 
         if not self.options.urls and \
-           not self.options.z3csphinx_output_directory:
+           not self.options.z3csphinx_output_directory and \
+           not self.options.no_packages:
             parser.error('Please provide package VCS URLs')
 
         if not self.options.workingdir:
@@ -159,6 +165,16 @@ class DocsBuilder(object):
                         {self.options.trunk_name: pkg_docs}
 
     def run(self):
+        if self.options.no_packages and self.options.index_template:
+            index_path = os.path.join(self.options.index_template,
+                                      '%s.rst' % self.options.index_name)
+            if not os.path.isfile(index_path):
+                tmpl_path = os.path.join(self.options.index_template,
+                                         '%s.rst.in' % self.options.index_name)
+                shutil.copyfile(tmpl_path, index_path)
+            self._build_sphinx()
+            return
+
         grouped = []
         [grouped.extend(x) for x in self.group_map.values()]
 
@@ -308,6 +324,9 @@ class DocsBuilder(object):
             tmp_index.write(required_index_contents)
             tmp_index.close()
 
+        self._build_sphinx()
+
+    def _build_sphinx(self):
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
         builder = Sphinx(self.options.index_template,
                          self.options.index_template,

@@ -74,6 +74,14 @@ which you can discover yourself by running ``docbuilder -h`` or
   separate page is inserted that shows all tags for the given package.
   The default value is 5.
 
+* ``-n`` or ``--no-packages``: Do not check out and include
+  documentation for any software package. This option will re-use
+  any ``index.rst`` already in place (or copy the template to
+  ``index.rst``) and then just build ``index.rst`` and whatever else
+  is refers to from its enclosing folder. This option speeds up
+  documentation builds when you are only changing non-package
+  documents.
+
 * ``-v`` or ``--verbose``: Set the log verbosity. If ``--v`` is 
   specified you will see more detailed logging output. If you 
   specify it more than once all :mod:`Sphinx` documentation build 
