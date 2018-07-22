@@ -3,6 +3,7 @@
 *.pyo
 *$py.class
 *.so
+*.swp
 __pycache__
 .coverage
 .installed.cfg
