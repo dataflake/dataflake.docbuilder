@@ -3,6 +3,9 @@ Change log
 
 1.23 (unreleased)
 -----------------
+- make sure to convert shell output to unicode on Python 3 and 2.
+- before invoking ``setup.py`` commands in a subshell, make sure
+  it is present.
 
 
 1.22 (2018-07-22)

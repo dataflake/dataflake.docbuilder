@@ -14,7 +14,6 @@
 """
 
 import os
-import six
 import subprocess
 
 
@@ -29,7 +28,8 @@ def shell_cmd(cmd, fromwhere=None):
         output = e.output
         print('%s: %s' % (cmd, output))
 
-    if six.PY3 and isinstance(output, bytes):
+    # Output is used to initialize an io.StringIO instance, which wants unicode
+    if isinstance(output, bytes):
         output = output.decode('UTF-8')
 
     os.chdir(cwd)

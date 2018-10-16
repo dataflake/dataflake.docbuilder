@@ -78,10 +78,11 @@ class RCSClient(object):
     def activate_egg(self, egg_path):
         """ Create the EGG_INFO structure in a checkout
         """
-        pythonpath = ':'.join(sys.path)
-        cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
-                pythonpath, sys.executable, egg_path)
-        shell_cmd(cmd, fromwhere=egg_path)
+        if 'setup.py' in os.listdir(egg_path):
+            pythonpath = ':'.join(sys.path)
+            cmd = 'PYTHONPATH="%s" %s %s/setup.py egg_info' % (
+                    pythonpath, sys.executable, egg_path)
+            shell_cmd(cmd, fromwhere=egg_path)
 
     def name_from_url(self, url):
         """ Determine a package name from its VCS URL

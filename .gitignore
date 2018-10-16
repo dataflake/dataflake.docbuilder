@@ -19,3 +19,6 @@ develop-eggs/
 dist/
 docs/_build/
 parts/
+dataflake/docbuilder/index_template/_build/
+dataflake/docbuilder/index_template/dataflake.docbuilder.rst
+dataflake/docbuilder/index_template/index.rst

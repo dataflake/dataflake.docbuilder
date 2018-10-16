@@ -347,7 +347,7 @@ class DocsBuilder(object):
         rst = ''
         package_path = os.path.join(self.options.workingdir, package_name)
         tag_folder = os.path.join(package_path, tag_name)
-        if os.path.isdir(tag_folder):
+        if os.path.isdir(tag_folder) and 'setup.py' in os.listdir(tag_folder):
             cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
                       ':'.join(sys.path), sys.executable, tag_folder)
             rst = shell_cmd(cmd, fromwhere=tag_folder)
