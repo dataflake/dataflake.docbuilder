@@ -54,6 +54,7 @@ setup(name=NAME,
       include_package_data=True,
       install_requires=[
         'setuptools',
+        'six',
         'Sphinx',
         'docutils',
         'zc.buildout',
