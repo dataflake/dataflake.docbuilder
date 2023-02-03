@@ -1,11 +1,16 @@
+# Generated from:
+# https://github.com/zopefoundation/meta/tree/master/config/pure-python
 include *.md
-include *.cfg
-include *.py
 include *.rst
 include *.txt
-exclude .*.cfg
+include buildout.cfg
+include tox.ini
 
-recursive-include dataflake *
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.txt
+recursive-include docs Makefile
 
-global-exclude *.pyc
-global-exclude *.pyo
+recursive-include src *.py
+recursive-include src *.css
+recursive-include src *.in

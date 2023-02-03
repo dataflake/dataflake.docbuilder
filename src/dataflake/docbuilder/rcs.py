@@ -15,10 +15,11 @@
 
 import logging
 import os
-from six.moves.urllib.parse import urlparse
 import sys
 
-from dataflake.docbuilder.utils import shell_cmd
+from six.moves.urllib.parse import urlparse
+
+from .utils import shell_cmd
 
 
 class RCSClient(object):
@@ -91,16 +92,16 @@ class RCSClient(object):
         return [x for x in parsed_url[2].split('/') if x][-1]
 
     def checkout(self, url, targetpath):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def checkout_tag(self, url, tag, tatgetpath):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def update(self, targetpath):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def get_tag_names(self, url, checkout_path):
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class HGClient(RCSClient):

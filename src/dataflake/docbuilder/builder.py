@@ -13,22 +13,24 @@
 """ The documentation builder class
 """
 
-from docutils.core import publish_file
-from docutils.utils import SystemMessage
-from io import StringIO
 import logging
 import optparse
 import os
-import pkg_resources
 import re
 import shutil
-from sphinx.application import Sphinx
 import sys
+from io import StringIO
 
-from dataflake.docbuilder.rcs import GitClient
-from dataflake.docbuilder.rcs import HGClient
-from dataflake.docbuilder.rcs import SVNClient
-from dataflake.docbuilder.utils import shell_cmd
+import pkg_resources
+from docutils.core import publish_file
+from docutils.utils import SystemMessage
+from sphinx.application import Sphinx
+
+from .rcs import GitClient
+from .rcs import HGClient
+from .rcs import SVNClient
+from .utils import shell_cmd
+
 
 LOG = logging.getLogger()
 LOG.addHandler(logging.StreamHandler(sys.stdout))

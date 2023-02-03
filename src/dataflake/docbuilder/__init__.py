@@ -18,6 +18,7 @@ import os
 import dataflake.docbuilder
 from dataflake.docbuilder.builder import DocsBuilder
 
+
 INITIALIZATION = """\
 import sys
 sys.argv.extend(%(script_arguments)s)
