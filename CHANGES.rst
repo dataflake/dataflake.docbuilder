@@ -1,6 +1,10 @@
 Change log
 ==========
 
+1.24 (unreleased)
+-----------------
+
+
 1.23 (2018-10-16)
 -----------------
 - make sure to convert shell output to unicode on Python 3 and 2.
