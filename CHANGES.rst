@@ -4,6 +4,10 @@ Change log
 2.0 (unreleased)
 ----------------
 
+- Add support for Python 3.8, 3.9, 3.10, 3.11.
+
+- Drop support for Python 2.7, 3.5, 3.6.
+
 
 1.23 (2018-10-16)
 -----------------
