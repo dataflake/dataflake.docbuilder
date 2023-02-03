@@ -58,7 +58,6 @@ setup(name='dataflake.docbuilder',
       python_requires='>=3.7',
       install_requires=[
         'setuptools',
-        'six',
         'Sphinx',
         'docutils',
         'zc.buildout',

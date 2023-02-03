@@ -26,7 +26,7 @@ def shell_cmd(cmd, fromwhere=None):
         output = subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError as e:
         output = e.output
-        print('%s: %s' % (cmd, output))
+        print(f'{cmd}: {output}')
 
     # Output is used to initialize an io.StringIO instance, which wants unicode
     if isinstance(output, bytes):

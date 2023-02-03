@@ -30,12 +30,7 @@ jobs:
         - ["3.9",   "docs"]
         - ["3.9",   "coverage"]
         exclude:
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.7",   "py37"] }
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.8",   "py38"] }
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.9",   "py39"] }
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.10",  "py310"] }
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.11",  "py311"] }
-          - { os: ["ubuntu", "ubuntu-20.04"], config: ["3.9",   "coverage"] }
+          - { os: ubuntu, config: ["3.9", "coverage"] }
 
     runs-on: ${{ matrix.os[1] }}
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
