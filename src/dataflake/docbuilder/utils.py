@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2011 Jens Vagelpohl and Contributors. All Rights Reserved.
+# Copyright (c) 2010-2023 Jens Vagelpohl and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -26,7 +26,7 @@ def shell_cmd(cmd, fromwhere=None):
         output = subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError as e:
         output = e.output
-        print('%s: %s' % (cmd, output))
+        print(f'{cmd}: {output}')
 
     # Output is used to initialize an io.StringIO instance, which wants unicode
     if isinstance(output, bytes):

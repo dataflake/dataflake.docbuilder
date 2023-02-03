@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2010 Jens Vagelpohl and Contributors. All Rights Reserved.
+# Copyright (c) 2010-2023 Jens Vagelpohl and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -17,16 +17,13 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-NAME = 'dataflake.docbuilder'
-
-
 def read(*rnames):
     with open(os.path.join(os.path.dirname(__file__), *rnames)) as f:
         return f.read()
 
 
-setup(name=NAME,
-      version=read('version.txt').strip(),
+setup(name='dataflake.docbuilder',
+      version='2.0.dev0',
       description='Automated Sphinx documentation builder',
       long_description=read('README.rst'),
       classifiers=[
@@ -34,13 +31,12 @@ setup(name=NAME,
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Zope Public License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries :: Python Modules",
@@ -48,21 +44,36 @@ setup(name=NAME,
       keywords='sphinx documentation',
       author="Jens Vagelpohl and contributors",
       author_email="jens@dataflake.org",
-      url="https://github.com/dataflake/%s" % NAME,
+      url="https://github.com/dataflake/dataflake.docbuilder",
+      project_urls={
+        'Sources': 'https://github.com/dataflake/dataflake.docbuilder',
+        'Issue Tracker': ('https://github.com/dataflake/'
+                          'dataflake.docbuilder/issues'),
+      },
       license="ZPL 2.1",
-      packages=find_packages(),
+      packages=find_packages('src'),
+      package_dir={'': 'src'},
+      namespace_packages=['dataflake'],
       include_package_data=True,
+      python_requires='>=3.7',
       install_requires=[
         'setuptools',
-        'six',
         'Sphinx',
         'docutils',
         'zc.buildout',
         'zc.recipe.egg',
+        'pkginfo',
         ],
+      extras_require={
+        'docs': ['Sphinx',
+                 'sphinx_rtd_theme',
+                 'sphinx-pypi-upload',
+                 'zc.rst2',
+                 ],
+        },
       zip_safe=False,
       entry_points={
-        'console_scripts': ['docbuilder = %s:run_builder' % NAME],
-        'zc.buildout': ['default=%s:BuildoutScript' % NAME]
+        'console_scripts': ['docbuilder = dataflake.docbuilder:run_builder'],
+        'zc.buildout': ['default=dataflake.docbuilder:BuildoutScript']
         },
       )

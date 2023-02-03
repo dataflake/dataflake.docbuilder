@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2010-2011 Jens Vagelpohl and Contributors. All Rights Reserved.
+# Copyright (c) 2010-2023 Jens Vagelpohl and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -13,22 +13,24 @@
 """ The documentation builder class
 """
 
-from docutils.core import publish_file
-from docutils.utils import SystemMessage
-from io import StringIO
 import logging
 import optparse
 import os
-import pkg_resources
 import re
 import shutil
-from sphinx.application import Sphinx
 import sys
+from io import StringIO
 
-from dataflake.docbuilder.rcs import GitClient
-from dataflake.docbuilder.rcs import HGClient
-from dataflake.docbuilder.rcs import SVNClient
-from dataflake.docbuilder.utils import shell_cmd
+import pkg_resources
+from docutils.core import publish_file
+from docutils.utils import SystemMessage
+from sphinx.application import Sphinx
+
+from .rcs import GitClient
+from .rcs import HGClient
+from .rcs import SVNClient
+from .utils import shell_cmd
+
 
 LOG = logging.getLogger()
 LOG.addHandler(logging.StreamHandler(sys.stdout))
@@ -106,7 +108,7 @@ OPTIONS = (
 )
 
 
-class DocsBuilder(object):
+class DocsBuilder:
 
     def __init__(self):
         parser = optparse.OptionParser(option_list=OPTIONS)
@@ -146,8 +148,8 @@ class DocsBuilder(object):
             LOG.error('Please specify a numeric value for --max-tags.')
 
         for group_spec in self.options.groupings or []:
-            package_name, group_name = [x.strip() for x in
-                                        group_spec.split(':')]
+            package_name, group_name = (x.strip() for x in
+                                        group_spec.split(':'))
             group_values = self.group_map.setdefault(group_name, [])
             group_values.append(package_name)
 
@@ -250,7 +252,7 @@ class DocsBuilder(object):
 
                 for tag_name in tag_names:
                     html_output_folder = self.packages[package_name][tag_name]
-                    ptp = '%s-%s' % (package_name, tag_name)
+                    ptp = f'{package_name}-{tag_name}'
                     tag_data = {'package_name': package_name,
                                 'package_tag': tag_name,
                                 'package_tag_path': ptp}
@@ -300,7 +302,7 @@ class DocsBuilder(object):
         template_path = os.path.join(self.options.index_template,
                                      '%s.rst.in' % self.options.index_name)
         if os.path.isfile(template_path):
-            template_file = open(template_path, 'r')
+            template_file = open(template_path)
             template_text = template_file.read()
             template_file.close()
         else:
@@ -317,7 +319,7 @@ class DocsBuilder(object):
             # Need to create a index.rst, otherwise Sphinx barfs
             required_index_contents = ''
             if os.path.isfile('%s.in' % required_index):
-                tmpl = open('%s.in' % required_index, 'r')
+                tmpl = open('%s.in' % required_index)
                 required_index_contents = tmpl.read()
                 tmpl.close()
             tmp_index = open(required_index, 'w')
@@ -348,7 +350,7 @@ class DocsBuilder(object):
         package_path = os.path.join(self.options.workingdir, package_name)
         tag_folder = os.path.join(package_path, tag_name)
         if os.path.isdir(tag_folder) and 'setup.py' in os.listdir(tag_folder):
-            cmd = 'PYTHONPATH="%s" %s %s/setup.py --long-description' % (
+            cmd = 'PYTHONPATH="{}" {} {}/setup.py --long-description'.format(
                       ':'.join(sys.path), sys.executable, tag_folder)
             rst = shell_cmd(cmd, fromwhere=tag_folder)
 
@@ -431,8 +433,7 @@ class DocsBuilder(object):
                                  freshenv=False,
                                  warningiserror=False,
                                  tags=None)
-                LOG.info('Building Sphinx docs for %s %s' % (
-                            package_name, tag))
+                LOG.info(f'Building Sphinx docs for {package_name} {tag}')
                 builder.build(True, None)
                 w = getattr(builder, '_warncount', 0)
                 if w:
@@ -455,7 +456,7 @@ class DocsBuilder(object):
             if tag_name == self.options.trunk_name:
                 target_name = package_name
             else:
-                target_name = '%s-%s' % (package_name, tag_name)
+                target_name = f'{package_name}-{tag_name}'
             html_link_path = os.path.join(self.options.htmldir, target_name)
 
             if os.path.islink(html_link_path):
