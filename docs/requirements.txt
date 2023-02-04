@@ -1,2 +1,1 @@
-pkginfo
-zc.rst2
+.[docs]
