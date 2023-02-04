@@ -1,3 +1,7 @@
+.. image:: https://github.com/dataflake/dataflake.docbuilder/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/dataflake/dataflake.docbuilder/actions/workflows/tests.yml
+   :alt: Unit test status
+
 .. image:: https://readthedocs.org/projects/dataflakedocbuilder/badge/?version=latest
    :target: https://dataflakedocbuilder.readthedocs.io
    :alt: Documentation Status
