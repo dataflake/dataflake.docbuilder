@@ -46,6 +46,7 @@ setup(name='dataflake.docbuilder',
       author_email="jens@dataflake.org",
       url="https://github.com/dataflake/dataflake.docbuilder",
       project_urls={
+        'Documentation': 'https://dataflakedocbuilder.readthedocs.io/',
         'Sources': 'https://github.com/dataflake/dataflake.docbuilder',
         'Issue Tracker': ('https://github.com/dataflake/'
                           'dataflake.docbuilder/issues'),

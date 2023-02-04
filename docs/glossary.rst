@@ -2,45 +2,38 @@
 
 .. _glossary:
 
-============================
 Glossary
-============================
+========
 
 .. glossary::
-  :sorted:
 
-  Interface
-    An attribute of a model object that determines its type.  It is an
-    instance of a ``zope.interface`` Interface class.
-
-  Virtualenv
-    An isolated Python environment.  Allows you to control which
-    packages are used on a particular project by cloning your main
-    Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
-    was created by Ian Bicking.
-
-  Setuptools
-    `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
-    builds on Python's ``distutils`` to provide easier building,
-    distribution, and installation of packages.
-
-  Subversion
-    `Subversion <http://subversion.apache.org/>`_ is a software version 
+  Git
+    `Git <https://git-scm.com/>`_ is a distributed software version 
     control system.
 
   Mercurial
-    `Mercurial <http://mercurial.selenic.com/>`_ is a distributed 
+    `Mercurial <https://www.mercurial-scm.org/>`_ is a distributed 
     software version control system.
 
-  Git
-    `Git <http://git-scm.com/>`_ is a distributed software version 
+  Sphinx
+    The documentation for this package is maintained using
+    `Sphinx <https://www.sphinx-doc.org/>`_, a tool to create documentation
+    in many formats based on reStructuredText files.
+
+  Subversion
+    `Subversion <https://subversion.apache.org/>`_ is a software version 
     control system.
+
+  virtual environment
+    The `Python venv module <https://docs.python.org/3/library/venv.html>`_
+    is used to create lightweight “virtual environments”, each with their
+    own independent set of Python packages installed in their site
+    directories. A virtual environment is created on top of an existing
+    Python installation, known as the virtual environment’s “base” Python,
+    and may optionally be isolated from the packages in the base environment,
+    so only those explicitly installed in the virtual environment are
+    available.
 
   zc.buildout
     `zc.buildout <http://buildout.org>`_ is a Python-based build system 
     for creating, assembling and deploying applications.
-
-  Zope
-    `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
-    of Python web frameworks.
-

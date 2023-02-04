@@ -1,13 +1,18 @@
-=============
- Development
-=============
+Development
+===========
+
+Bug tracker
+-----------
+For bug reports, suggestions or questions please use the 
+GitHub issue tracker at 
+https://github.com/dataflake/dataflake.docbuilder/issues.
 
 
 Getting the source code
-=======================
-The source code is maintained on GitHub. To check out the trunk:
+-----------------------
+The source code is maintained on GitHub. To check out the main branch:
 
-.. code-block:: sh
+.. code-block:: console
 
   $ git clone https://github.com/dataflake/dataflake.docbuilder.git
 
@@ -15,53 +20,30 @@ You can also browse the code online at
 https://github.com/dataflake/dataflake.docbuilder
 
 
-Bug tracker
-===========
-For bug reports, suggestions or questions please use the 
-GitHub issue tracker at 
-https://github.com/dataflake/dataflake.docbuilder/issues.
+Preparing the development sandbox
+---------------------------------
+The following steps only need to be done once to install all the tools and
+scripts needed for building, packaging and testing. First, create a
+:term:`Virtual environment`. The example here uses Python 3.11, but any Python
+version supported by this package will work. Then install all the required
+tools:
+
+.. code-block:: console
+
+    $ cd dataflake.docbuilder
+    $ python3.11 -m venv .
+    $ bin/pip install -U pip wheel
+    $ bin/pip install -U setuptools zc.buildout tox twine
 
 
-Building the documentation using :mod:`zc.buildout`
-===================================================
-:mod:`dataflake.docbuilder` ships with its own :file:`buildout.cfg` file and
-:file:`bootstrap.py` for setting up a development buildout:
+Building the documentation
+--------------------------
+``tox`` is also used to build the :term:`Sphinx`-based documentation. The
+input files are in the `docs` subfolder and the documentation build step will
+compile them to HTML. The output is stored in `docs/_build/html/`:
 
-.. code-block:: sh
+.. code-block:: console
 
-  $ python bootstrap.py
-  ...
-  Generated script '.../bin/buildout'
-  $ bin/buildout
-  ...
-  Generated script '...bin/docbuilder'.
-  ...
-  Generated script '...bin/docbuilderdocs'.
+    $ bin/tox -edocs
 
-The :mod:`dataflake.docbuilder` buildout installs the Sphinx scripts required 
-to build the documentation, including testing its code snippets:
-
-.. code-block:: sh
-
-   $ cd docs
-   $ PATH=../bin:$PATH make html
-   sphinx-build -b html -d _build/doctrees   . _build/html
-   ...
-   build succeeded.
-
-   Build finished. The HTML pages are in _build/html.
-
-
-Making a release
-================
-These instructions assume that you have a development sandbox set 
-up using :mod:`zc.buildout` as the scripts used here are generated 
-by the buildout.
-
-.. code-block:: sh
-
-  $ bin/buildout -o
-  $ python setup.py sdist bdist_wheel upload --sign
-
-The ``bin/buildout`` step will make sure the correct package information 
-is used.
+If the documentation contains doctests they are run as well.

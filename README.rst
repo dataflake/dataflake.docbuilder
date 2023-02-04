@@ -10,9 +10,11 @@
    :target: https://pypi.python.org/pypi/dataflake.docbuilder
    :alt: Python versions
 
+
 ======================
  dataflake.docbuilder
 ======================
+
 This package provides a set of scripts to automate building
 Sphinx-based package documentation for packages hosted on a 
 source code revision control server such as Subversion, 
@@ -25,15 +27,3 @@ Git or Mercurial. They will...
     versions
   * rebuild the Sphinx documentation if there were any changes 
     since the last build
-
-
-Documentation
-=============
-Full documentation is available at 
-https://dataflakedocbuilder.readthedocs.io/
-
-
-Bug tracker
-===========
-A bug tracker is available at 
-https://github.com/dataflake/dataflake.docbuilder/issues

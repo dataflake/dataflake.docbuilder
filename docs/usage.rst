@@ -1,9 +1,9 @@
 Using dataflake.docbuilder
 ==========================
 :mod:`dataflake.docbuilder` can be used in two ways. It defines a 
-:term:`Setuptools` entry point called ``docbuilder``, which automatically 
+`Setuptools` entry point called ``docbuilder``, which automatically 
 creates a shell script ``docbuilder`` when the package is installed 
-through :term:`Setuptools`. If you are using :term:`zc.buildout`, you 
+through `Setuptools`. If you are using :term:`zc.buildout`, you 
 can use the package directly as a ``recipe`` and configure the 
 documentation builder within your buildout configuration file.
 
@@ -28,9 +28,9 @@ documentation builder within your buildout configuration file.
     for input on a prompt you will never see.
 
 
-From :term:`Setuptools`
------------------------
-After installing :mod:`dataflake.docbuilder` using :term:`Setuptools`,
+From ``pip``
+------------
+After installing :mod:`dataflake.docbuilder` using `Setuptools`,
 a shell script named ``docbuilder`` is created. This can be used to 
 invoke the documentation build process and accepts several options, 
 which you can discover yourself by running ``docbuilder -h`` or 
@@ -106,7 +106,7 @@ which you can discover yourself by running ``docbuilder -h`` or
   is ``index``.
 
 * ``--fallback-css=<PATH>``: Optional path to a CSS file used for
-  styling converted ReST output generated from the :term:`setuptools`
+  styling converted ReST output generated from the `Setuptools`
   ``long_description`` package option. The ``long_description`` value 
   is used as a fallback if no full Sphinx documentation can be found.
 

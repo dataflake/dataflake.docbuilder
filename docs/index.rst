@@ -1,11 +1,4 @@
-.. _index:
-
-=============
-Documentation
-=============
-:mod:`dataflake.docbuilder` provides a set of scripts to automate 
-building `Sphinx`-based package documentation for packages hosted on 
-a revision control server such as `Git`, `Mercurial` or `Subversion`.
+.. include:: ../README.rst
 
 
 Narrative documentation
@@ -13,22 +6,21 @@ Narrative documentation
 Narrative documentation explaining how to use :mod:`dataflake.docbuilder`.
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   install
-   usage
-   development
-   changes
+    installation
+    usage
+    development
+    changes
 
 
 Support
 -------
 If you need commercial support for this software package, please
-see `https://www.zetwork.com <https://www.zetwork.com/>`_.
+visit `https://www.zetwork.com <https://www.zetwork.com/>`_.
 
 
 Indices and tables
 ------------------
 * :ref:`genindex`
-* :ref:`search`
 * :ref:`glossary`
