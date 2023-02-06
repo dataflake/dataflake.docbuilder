@@ -1,8 +1,10 @@
 Change log
 ==========
 
-2.1 (unreleased)
+2.1 (2022-02-06)
 ----------------
+
+- Add support for older Git versions.
 
 
 2.0 (2023-02-06)

@@ -106,10 +106,15 @@ class RCSClient:
 
 class GitClient(RCSClient):
 
+    def __init__(self, logger=logging.getLogger()):
+        super().__init__(logger=logging.getLogger())
+        version_output = shell_cmd('git --version')
+        self.version = version_output.split()[-1]
+
     def update(self, checkout_path):
         """ Update an existing checkout
         """
-        shell_cmd('git fetch --all && git pull', fromwhere=checkout_path)
+        shell_cmd('git fetch -q --all && git pull', fromwhere=checkout_path)
 
     def checkout(self, url, checkout_path):
         """ Check out from a repository
@@ -130,8 +135,11 @@ class GitClient(RCSClient):
         ``git tag`` is doing the sorting here.
         """
         tags = []
-        output = shell_cmd('git tag --sort=version:refname',
-                           fromwhere=checkout_path)
+        if self.version < '2':
+            cmd = 'git tag'
+        else:
+            cmd = 'git tag --sort=version:refname'
+        output = shell_cmd(cmd, fromwhere=checkout_path)
         if output:
             for line in output.split():
                 tags.append(line.strip())
@@ -150,4 +158,10 @@ class GitClient(RCSClient):
     def get_current_branch_name(self, checkout_path):
         """ Get the current branch name
         """
+        if self.version < '2':
+            output = shell_cmd('git branch', fromwhere=checkout_path)
+            for line in output.split('\n'):
+                if line.strip().startswith('*'):
+                    return line.split()[-1].strip()
+
         return shell_cmd('git branch --show-current', fromwhere=checkout_path)
