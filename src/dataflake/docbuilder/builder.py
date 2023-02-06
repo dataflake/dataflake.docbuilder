@@ -321,7 +321,10 @@ class DocsBuilder:
 
             req = pkg_resources.Requirement.parse(package_name)
             distribution = pkg_resources.working_set.find(req)
-            distribution.activate()
+            if distribution is not None:
+                distribution.activate()
+            else:
+                pkg_resources.working_set.add_entry(package_path)
 
             if self.options.verbose and self.options.verbose > 1:
                 output_pipeline = sys.stderr
