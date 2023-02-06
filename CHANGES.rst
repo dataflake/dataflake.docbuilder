@@ -1,8 +1,10 @@
 Change log
 ==========
 
-2.3 (unreleased)
+2.3 (2023-02-06)
 ----------------
+
+- Fix index page link creation
 
 
 2.2 (2023-02-06)

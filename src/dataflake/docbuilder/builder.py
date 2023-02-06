@@ -184,11 +184,15 @@ class DocsBuilder:
 
                 for tag_name in tag_names:
                     html_output_folder = package_info['tag_html'].get(tag_name)
+                    tag_folder = ''
+                    if html_output_folder:
+                        tag_folder = os.path.basename(html_output_folder)
+
                     tag_data = {'package_name': package_name,
                                 'package_tag': tag_name,
-                                'package_tag_path': html_output_folder}
+                                'package_tag_path': tag_folder}
 
-                    if html_output_folder:
+                    if tag_folder:
                         tag_txt = output['link'] % tag_data
                     else:
                         tag_txt = output['nolink'] % tag_data
@@ -373,7 +377,7 @@ class DocsBuilder:
 
 
 LINK_RST = """\
-* `%(package_name)s %(package_tag)s <%(package_tag_path)s/index.html>`_\
+* `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
 """
 MORE_RST = """\
 `view all versions... <./%(package_name)s.html>`_
