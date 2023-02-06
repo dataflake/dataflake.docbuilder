@@ -32,20 +32,25 @@ class RCSClient:
     def checkout_or_update(self, url, workingdir, trunk_only=True):
         package_name = self.name_from_url(url)
         package_dir = os.path.join(workingdir, package_name)
-        package_info = {'name': package_name,
-                        'url': url,
-                        'path': package_dir,
-                        'tags': []}
+        package_info = {
+            'name': package_name,
+            'url': url,
+            'path': package_dir,
+            'tags': [],
+            'main_branch': self.get_main_branch_name(url, package_dir),
+            }
 
         if os.path.isdir(package_dir):
             self.logger.info(f'Updating {package_name}')
+            current = self.get_current_branch_name(package_dir)
+            main = self.get_main_branch_name(url, package_dir)
+            if current != main:
+                self.checkout_tag(url, main, package_dir)
             self.update(package_dir)
         else:
             self.logger.info(f'Cloning {package_name}')
             self.checkout(url, package_dir)
 
-        package_info['main_branch'] = (
-            self.get_main_branch_name(url, package_dir))
         if not trunk_only:
             package_info['tags'] = self.get_tag_names(url, package_dir)
 
@@ -95,34 +100,8 @@ class RCSClient:
     def get_main_branch_name(self, url, checkout_path):
         raise NotImplementedError()
 
-
-class HGClient(RCSClient):
-
-    def update(self, checkout_path):
-        """ Update an existing checkout
-        """
-        shell_cmd('hg pull -u', fromwhere=checkout_path)
-
-    def checkout(self, url, checkout_path):
-        """ Check out from a repository
-        """
-        shell_cmd(f'hg clone {url} {checkout_path}')
-
-    def checkout_tag(self, url, tag, checkout_path):
-        """ Check out a specific tag
-        """
-        shell_cmd(f'hg clone -r {tag} {url} {checkout_path}')
-
-    def get_tag_names(self, url, checkout_path):
-        """ Get all tag names from a repository URL
-        """
-        tags = []
-        output = shell_cmd('hg tags', fromwhere=checkout_path)
-        for line in output.split('\n'):
-            tag, revision = line.split()
-            if tag != 'tip':
-                tags.append(tag)
-        return sorted(tags)
+    def get_current_branch_name(self, checkout_path):
+        raise NotImplementedError()
 
 
 class GitClient(RCSClient):
@@ -130,12 +109,12 @@ class GitClient(RCSClient):
     def update(self, checkout_path):
         """ Update an existing checkout
         """
-        shell_cmd('git fetch origin && git pull', fromwhere=checkout_path)
+        shell_cmd('git fetch --all && git pull', fromwhere=checkout_path)
 
     def checkout(self, url, checkout_path):
         """ Check out from a repository
         """
-        shell_cmd(f'git clone {url} {checkout_path}')
+        shell_cmd(f'git clone -q {url} {checkout_path}')
         # Silence warnings
         shell_cmd('git config --local advice.detachedHead "false"',
                   fromwhere=checkout_path)
@@ -143,7 +122,7 @@ class GitClient(RCSClient):
     def checkout_tag(self, url, tag, checkout_path):
         """ Check out a specific tag
         """
-        shell_cmd(f'git checkout {tag}', fromwhere=checkout_path)
+        shell_cmd(f'git checkout -q {tag}', fromwhere=checkout_path)
 
     def get_tag_names(self, url, checkout_path):
         """ Get all tag names from a repository URL
@@ -167,3 +146,8 @@ class GitClient(RCSClient):
                            fromwhere=checkout_path)
         if output:
             return output.strip().split('/')[-1]
+
+    def get_current_branch_name(self, checkout_path):
+        """ Get the current branch name
+        """
+        return shell_cmd('git branch --show-current', fromwhere=checkout_path)

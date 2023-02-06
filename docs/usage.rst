@@ -21,8 +21,8 @@ documentation builder within your buildout configuration file.
 
 .. warning::
 
-    The document build script will call the Subversion, Mercurial or
-    Git script through the shell. Make sure you can check out or update 
+    The document build script will call the Git script through the shell.
+    Make sure you can check out or update 
     the packages you want to document without receiving any prompts, 
     e.g. for credentials, otherwise the script will just hang waiting 
     for input on a prompt you will never see.
@@ -42,7 +42,6 @@ which you can discover yourself by running ``docbuilder -h`` or
   the URL with information about the revision control server used, 
   if no prefix is given, :term:`Git` is assumed::
   
-    [hg]https://myserver/hg/mypackage
     [git]https://myserver/git/mypackage
     https://github.com/organization/myotherpackage.git
 

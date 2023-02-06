@@ -19,17 +19,17 @@ import os
 import re
 import shutil
 import sys
+import warnings
 
 import pkg_resources
 from sphinx.application import Sphinx
 
 from .rcs import GitClient
-from .rcs import HGClient
 
 
 LOG = logging.getLogger()
 LOG.addHandler(logging.StreamHandler(sys.stdout))
-SUPPORTED_VCS = {'git': GitClient, 'hg': HGClient}
+SUPPORTED_VCS = {'git': GitClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (
@@ -139,7 +139,6 @@ class DocsBuilder:
 
             self.rcs = rcs_class(logger=LOG)
             package_name = self.rcs.name_from_url(package_url)
-            LOG.info(f'Cloning/updating {package_url}')
             info = self.rcs.checkout_or_update(
                 package_url,
                 self.options.workingdir,
@@ -256,6 +255,11 @@ class DocsBuilder:
 
     def _build_sphinx(self):
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
+        if self.options.verbose and self.options.verbose > 1:
+            output_pipeline = sys.stderr
+        else:
+            output_pipeline = None
+
         builder = Sphinx(self.options.index_template,
                          self.options.index_template,
                          self.options.htmldir,
@@ -263,7 +267,7 @@ class DocsBuilder:
                          'html',
                          {},
                          None,
-                         warning=sys.stderr,
+                         warning=output_pipeline,
                          freshenv=False,
                          warningiserror=False,
                          tags=None)
@@ -325,22 +329,24 @@ class DocsBuilder:
                 output_pipeline = None
 
             try:
-                builder = Sphinx(doc_folder,
-                                 doc_folder,
-                                 html_output_folder,
-                                 os.path.join(build_folder, 'doctrees'),
-                                 'html',
-                                 {},
-                                 None,
-                                 warning=output_pipeline,
-                                 freshenv=False,
-                                 warningiserror=False,
-                                 tags=None)
-                LOG.info(f'Building Sphinx docs for {package_name} {tag}')
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    builder = Sphinx(doc_folder,
+                                     doc_folder,
+                                     html_output_folder,
+                                     os.path.join(build_folder, 'doctrees'),
+                                     'html',
+                                     {},
+                                     None,
+                                     warning=output_pipeline,
+                                     freshenv=False,
+                                     warningiserror=False,
+                                     tags=None)
+                LOG.info(f'(Re)building Sphinx docs for {package_name} {tag}')
                 builder.build(True, None)
-                warnings = getattr(builder, '_warncount', 0)
-                if warnings:
-                    LOG.info(f'Sphinx shows {warnings} warnings/errors.')
+                warncount = getattr(builder, '_warncount', 0)
+                if warncount:
+                    LOG.info(f'Sphinx had {warncount} warnings.')
 
                 # Copy HTML to its final resting place
                 if os.path.isdir(html_path):

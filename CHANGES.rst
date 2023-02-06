@@ -6,7 +6,7 @@ Change log
 
 - Drop support for documentation generated with ``z3c.recipe.sphinx``.
 
-- Drop support for Subversion.
+- Drop support for Subversion and Mercurial.
 
 - Drop option ``copy-output``. Always copy HTML output to HTML output folder.
 
