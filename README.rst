@@ -21,8 +21,8 @@
 
 This package provides a set of scripts to automate building
 Sphinx-based package documentation for packages hosted on a 
-source code revision control server such as Subversion, 
-Git or Mercurial. They will...
+source code revision control server. At this point only Git
+repositories are supported.
 
   * check out the current development trunk and all tagged versions
   * build all Sphinx-based documentation in them, if it exists

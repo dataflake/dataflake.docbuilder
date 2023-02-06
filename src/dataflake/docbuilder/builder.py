@@ -19,22 +19,17 @@ import os
 import re
 import shutil
 import sys
-from io import StringIO
+import warnings
 
 import pkg_resources
-from docutils.core import publish_file
-from docutils.utils import SystemMessage
 from sphinx.application import Sphinx
 
 from .rcs import GitClient
-from .rcs import HGClient
-from .rcs import SVNClient
-from .utils import shell_cmd
 
 
 LOG = logging.getLogger()
 LOG.addHandler(logging.StreamHandler(sys.stdout))
-SUPPORTED_VCS = {'svn': SVNClient, 'git': GitClient, 'hg': HGClient}
+SUPPORTED_VCS = {'git': GitClient}
 VCS_SPEC_MATCH = re.compile(r'^\[(.*)\](.*)$')
 
 OPTIONS = (
@@ -51,10 +46,6 @@ OPTIONS = (
                        action='store', dest='htmldir',
                        help='Root folder for HTML output and links (default: \
                              $working-directory/html)'),
-  optparse.make_option('-c', '--copy-output',
-                       action='store_true', dest='copy_output',
-                       help='Copy all HTML output instead of linking it to \
-                             the output directory'),
   optparse.make_option('-t', '--trunk-only',
                        action='store_true', dest='trunk_only',
                        help='Only build trunk documentation? (default: False)',
@@ -65,11 +56,6 @@ OPTIONS = (
                              If the value is "0" or "1", only the trunk is \
                              built. Default: 5',
                        default=5),
-  optparse.make_option('-n', '--no-packages',
-                       action='store_true', dest='no_packages',
-                       help='Do not check out and build any package \
-                             documentation. Default: False.',
-                       default=False),
   optparse.make_option('-v', '--verbose',
                        action='count', dest='verbose',
                        help='Log verbosity'),
@@ -82,29 +68,11 @@ OPTIONS = (
                        help='The index file name, without extension. Defaults \
                              to "index".',
                        default='index'),
-  optparse.make_option('--fallback-css',
-                       action='store', dest='fallback_css',
-                       help='Path to a CSS file with styles used for plain \
-                             ReST documentation'),
   optparse.make_option('--docs-directory',
                        action='append', dest='docs_folders',
                        help='Sphinx documentation folder name (can be used \
                              multiple times, default: "doc" and "docs")',
                        default=['doc', 'docs']),
-  optparse.make_option('--trunk-directory',
-                       action='store', dest='trunk_name',
-                       help='Development trunk container name \
-                             (default: "trunk")',
-                       default='trunk'),
-  optparse.make_option('--tags-directory',
-                       action='store', dest='tags_name',
-                       help='Development tags container name \
-                             (default: "tags")',
-                       default='tags'),
-  optparse.make_option('--z3csphinx-output-directory',
-                       action='store', dest='z3csphinx_output_directory',
-                       help='Root folder for z3c.recipe.sphinx-generated \
-                             documentation'),
 )
 
 
@@ -115,15 +83,14 @@ class DocsBuilder:
         self.options, self.args = parser.parse_args()
         self.packages = {}
         self.group_map = {}
+        self.rcs = None
 
         if self.options.verbose:
             LOG.setLevel(logging.DEBUG)
         else:
             LOG.setLevel(logging.WARNING)
 
-        if not self.options.urls and \
-           not self.options.z3csphinx_output_directory and \
-           not self.options.no_packages:
+        if not self.options.urls:
             parser.error('Please provide package VCS URLs')
 
         if not self.options.workingdir:
@@ -153,30 +120,7 @@ class DocsBuilder:
             group_values = self.group_map.setdefault(group_name, [])
             group_values.append(package_name)
 
-        self.z3csphinx_packages = {}
-        if self.options.z3csphinx_output_directory:
-            root_pkgs = os.listdir(self.options.z3csphinx_output_directory)
-
-            for pkg_name in root_pkgs:
-                zod = self.options.z3csphinx_output_directory
-                pkg_docs = os.path.join(zod, pkg_name, 'build', pkg_name)
-                self.z3csphinx_packages[pkg_name] = pkg_docs
-
-                if not self.options.urls:
-                    self.packages[pkg_name] = \
-                        {self.options.trunk_name: pkg_docs}
-
     def run(self):
-        if self.options.no_packages and self.options.index_template:
-            index_path = os.path.join(self.options.index_template,
-                                      '%s.rst' % self.options.index_name)
-            if not os.path.isfile(index_path):
-                tmpl_path = os.path.join(self.options.index_template,
-                                         '%s.rst.in' % self.options.index_name)
-                shutil.copyfile(tmpl_path, index_path)
-            self._build_sphinx()
-            return
-
         grouped = []
         [grouped.extend(x) for x in self.group_map.values()]
 
@@ -190,20 +134,15 @@ class DocsBuilder:
                 package_url = url
 
             if rcs_class is None:
-                LOG.warning('Unsupported VCS URL, ignoring: %s' % url)
+                LOG.warning(f'Unsupported VCS URL, ignoring: {url}')
                 continue
 
-            rcs = rcs_class(self.options.trunk_name,
-                            self.options.tags_name, logger=LOG)
-            package_name = rcs.name_from_url(package_url)
-            if package_name not in self.z3csphinx_packages:
-                LOG.info('Checking out %s' % package_url)
-                info = rcs.checkout_or_update(package_url,
-                                              self.options.workingdir,
-                                              self.options.trunk_only)
-            else:
-                info = {}
-
+            self.rcs = rcs_class(logger=LOG)
+            package_name = self.rcs.name_from_url(package_url)
+            info = self.rcs.checkout_or_update(
+                package_url,
+                self.options.workingdir,
+                trunk_only=self.options.trunk_only)
             self.packages[package_name] = info
 
         for package_name in self.packages.keys():
@@ -211,12 +150,7 @@ class DocsBuilder:
                 group_values = self.group_map.setdefault('', [])
                 group_values.append(package_name)
 
-            if package_name not in self.z3csphinx_packages:
-                self.build_html(package_name)
-            else:
-                pkg_docs = self.z3csphinx_packages.get(package_name)
-                self.packages[package_name][self.options.trunk_name] = pkg_docs
-            self.link_html(package_name)
+            self.build_html(package_name)
 
         if self.options.index_template:
             self.create_index_html()
@@ -241,27 +175,18 @@ class DocsBuilder:
 
             for package_name in package_names:
                 tags_list = []
-                tag_names = sorted(self.packages[package_name].keys(),
-                                   key=pkg_resources.parse_version,
-                                   reverse=True)
-
-                # Make sure trunk stays at the top
-                if self.options.trunk_name in tag_names:
-                    tag_names.remove(self.options.trunk_name)
-                    tag_names.insert(0, self.options.trunk_name)
+                package_info = self.packages[package_name]
+                main_branch = package_info['main_branch']
+                tag_names = list(reversed(package_info['tags']))
+                if self.options.max_tags:
+                    tag_names = tag_names[:self.options.max_tags]
+                tag_names.insert(0, main_branch)
 
                 for tag_name in tag_names:
-                    html_output_folder = self.packages[package_name][tag_name]
-                    ptp = f'{package_name}-{tag_name}'
+                    html_output_folder = package_info['tag_html'].get(tag_name)
                     tag_data = {'package_name': package_name,
                                 'package_tag': tag_name,
-                                'package_tag_path': ptp}
-                    if tag_name == self.options.trunk_name:
-                        tag_data['package_tag'] = 'development'
-                        tag_data['package_tag_path'] = package_name
-
-                        if self.options.trunk_only:
-                            tag_data['package_tag'] = ''
+                                'package_tag_path': html_output_folder}
 
                     if html_output_folder:
                         tag_txt = output['link'] % tag_data
@@ -330,6 +255,11 @@ class DocsBuilder:
 
     def _build_sphinx(self):
         dt = os.path.join(self.options.index_template, '_build', 'doctrees')
+        if self.options.verbose and self.options.verbose > 1:
+            output_pipeline = sys.stderr
+        else:
+            output_pipeline = None
+
         builder = Sphinx(self.options.index_template,
                          self.options.index_template,
                          self.options.htmldir,
@@ -337,84 +267,61 @@ class DocsBuilder:
                          'html',
                          {},
                          None,
-                         warning=sys.stderr,
+                         warning=output_pipeline,
                          freshenv=False,
                          warningiserror=False,
                          tags=None)
         builder.build(True, None)
 
-    def _build_simple_rst(self, package_name, tag_name):
-        """ Build HTML output from the setuptools long_description
-        """
-        rst = ''
-        package_path = os.path.join(self.options.workingdir, package_name)
-        tag_folder = os.path.join(package_path, tag_name)
-        if os.path.isdir(tag_folder) and 'setup.py' in os.listdir(tag_folder):
-            cmd = 'PYTHONPATH="{}" {} {}/setup.py --long-description'.format(
-                      ':'.join(sys.path), sys.executable, tag_folder)
-            rst = shell_cmd(cmd, fromwhere=tag_folder)
-
-        if rst and rst != 'UNKNOWN':
-            build_folder = os.path.join(tag_folder, '.docbuilder_html')
-            shutil.rmtree(build_folder, ignore_errors=True)
-            os.mkdir(build_folder)
-            output_path = os.path.join(build_folder, 'index.html')
-            settings = {}
-            if os.path.isfile(self.options.fallback_css):
-                settings = {'stylesheet_path': self.options.fallback_css}
-            try:
-                publish_file(source=StringIO(rst),
-                             writer_name='html',
-                             destination_path=output_path,
-                             settings_overrides=settings)
-                self.packages[package_name][tag_name] = build_folder
-                msg = 'Building simple ReST docs for %s %s.'
-                LOG.info(msg % (package_name, tag_name))
-            except SystemMessage as e:
-                msg = 'Building simple ReST doc for %s %s failed!'
-                LOG.error(msg % (package_name, tag_name))
-                LOG.error(str(e))
-                pass
-
     def build_html(self, package_name):
-        package_path = os.path.join(self.options.workingdir, package_name)
+        package_info = self.packages[package_name]
+        package_info['tag_html'] = {}
+        package_path = package_info['path']
+        main_branch = package_info['main_branch']
+        package_tags = list(reversed(package_info['tags']))
+        if self.options.max_tags and \
+           len(package_tags) > self.options.max_tags:
+            package_tags = package_tags[:self.options.max_tags]
+        tags = [main_branch] + package_tags
 
-        for tag in list(self.packages[package_name]):
-            tag_folder = os.path.join(package_path, tag)
+        for tag in tags:
+            if tag == main_branch:
+                target_name = package_name
+            else:
+                target_name = f'{package_name}-{tag}'
+            html_path = os.path.join(self.options.htmldir, target_name)
+
+            if os.path.isfile(os.path.join(html_path, 'index.html')) and \
+               tag != main_branch:
+                # Documentation has been built already, don't do any more work
+                LOG.info(f'{package_name} tag {tag} done already, skipping.')
+                package_info['tag_html'][tag] = html_path
+                continue
+
+            self.rcs.checkout_tag(package_info['url'], tag, package_path)
+
             doc_folder = None
             for folder_name in self.options.docs_folders:
-                doc_candidate = os.path.join(tag_folder, folder_name)
+                doc_candidate = os.path.join(package_path, folder_name)
                 if os.path.isdir(doc_candidate) and \
                    os.path.isfile(os.path.join(doc_candidate, 'conf.py')):
                     doc_folder = doc_candidate
                     break
 
-            if not doc_folder:
-                # Last fallback: long description from setup.py
-                self._build_simple_rst(package_name, tag)
+            if doc_folder is None:
+                LOG.info(f'{package_name} at tag {tag} contains no '
+                         'Sphinx docs folder, skipping.')
                 continue
 
             build_folder = os.path.join(doc_folder, '.build')
             shutil.rmtree(build_folder, ignore_errors=True)
             os.mkdir(build_folder)
             html_output_folder = os.path.join(build_folder, 'html')
-
             old_sys_path = sys.path
-            distributions = []
-            for root, dirs, files in os.walk(tag_folder):
-                if '.svn' in dirs:
-                    dirs.remove('.svn')
-                for dir_name in dirs:
-                    path = os.path.join(root, dir_name)
-                    found = pkg_resources.find_distributions(path)
-                    distributions.extend(found)
 
-            for distribution in distributions:
-                distribution.activate()
-                pkg_resources.working_set.add_entry(distribution.location)
-
-            if not distributions:
-                pkg_resources.working_set.add_entry(tag_folder)
+            req = pkg_resources.Requirement.parse(package_name)
+            distribution = pkg_resources.working_set.find(req)
+            distribution.activate()
 
             if self.options.verbose and self.options.verbose > 1:
                 output_pipeline = sys.stderr
@@ -422,58 +329,48 @@ class DocsBuilder:
                 output_pipeline = None
 
             try:
-                builder = Sphinx(doc_folder,
-                                 doc_folder,
-                                 html_output_folder,
-                                 os.path.join(build_folder, 'doctrees'),
-                                 'html',
-                                 {},
-                                 None,
-                                 warning=output_pipeline,
-                                 freshenv=False,
-                                 warningiserror=False,
-                                 tags=None)
-                LOG.info(f'Building Sphinx docs for {package_name} {tag}')
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    builder = Sphinx(doc_folder,
+                                     doc_folder,
+                                     html_output_folder,
+                                     os.path.join(build_folder, 'doctrees'),
+                                     'html',
+                                     {},
+                                     None,
+                                     warning=output_pipeline,
+                                     freshenv=False,
+                                     warningiserror=False,
+                                     tags=None)
+                LOG.info(f'(Re)building Sphinx docs for {package_name} {tag}')
                 builder.build(True, None)
-                w = getattr(builder, '_warncount', 0)
-                if w:
-                    LOG.info('Sphinx build generated %s warnings/errors.' % w)
-                self.packages[package_name][tag] = html_output_folder
-                sys.path = old_sys_path
+                warncount = getattr(builder, '_warncount', 0)
+                if warncount:
+                    LOG.info(f'Sphinx had {warncount} warnings.')
+
+                # Copy HTML to its final resting place
+                if os.path.isdir(html_path):
+                    # This will only ever be true for the main branch, which
+                    # is always regenerated.
+                    shutil.rmtree(html_path)
+
+                shutil.copytree(html_output_folder, html_path)
+
+                package_info['tag_html'][tag] = html_path
+
             except pkg_resources.DistributionNotFound as e:
                 msg = 'Building Sphinx docs for %s %s failed: missing \
                        dependency %s'
                 LOG.error(msg % (package_name, tag, str(e)))
-            except IndexError as e:
+            except Exception as e:
                 msg = 'Building Sphinx docs for %s %s failed: %s'
                 LOG.error(msg % (package_name, tag, str(e)))
-
-    def link_html(self, package_name):
-        p_data = self.packages[package_name]
-        tags_with_docs = [(x, p_data[x]) for x in p_data if p_data.get(x)]
-
-        for tag_name, html_output_folder in tags_with_docs:
-            if tag_name == self.options.trunk_name:
-                target_name = package_name
-            else:
-                target_name = f'{package_name}-{tag_name}'
-            html_link_path = os.path.join(self.options.htmldir, target_name)
-
-            if os.path.islink(html_link_path):
-                os.remove(html_link_path)
-            elif os.path.isdir(html_link_path):
-                shutil.rmtree(html_link_path)
-            elif os.path.lexists(html_link_path):
-                os.remove(html_link_path)
-
-            if self.options.copy_output:
-                shutil.copytree(html_output_folder, html_link_path)
-            else:
-                os.symlink(html_output_folder, html_link_path)
+            finally:
+                sys.path = old_sys_path
 
 
 LINK_RST = """\
-* `%(package_name)s %(package_tag)s <./%(package_tag_path)s/index.html>`_\
+* `%(package_name)s %(package_tag)s <%(package_tag_path)s/index.html>`_\
 """
 MORE_RST = """\
 `view all versions... <./%(package_name)s.html>`_

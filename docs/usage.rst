@@ -21,8 +21,8 @@ documentation builder within your buildout configuration file.
 
 .. warning::
 
-    The document build script will call the Subversion, Mercurial or
-    Git script through the shell. Make sure you can check out or update 
+    The document build script will call the Git script through the shell.
+    Make sure you can check out or update 
     the packages you want to document without receiving any prompts, 
     e.g. for credentials, otherwise the script will just hang waiting 
     for input on a prompt you will never see.
@@ -42,9 +42,7 @@ which you can discover yourself by running ``docbuilder -h`` or
   the URL with information about the revision control server used, 
   if no prefix is given, :term:`Git` is assumed::
   
-    [hg]https://myserver/hg/mypackage
     [git]https://myserver/git/mypackage
-    [svn]https://myserver/svn/mypackage
     https://github.com/organization/myotherpackage.git
 
 * ``-g <GROUP>`` or ``--grouping=<GROUP>``: You can group packages 
@@ -62,25 +60,14 @@ which you can discover yourself by running ``docbuilder -h`` or
   it is not specified, the HTML output tree will end up in a folder 
   named `html` inside the ``working-directory``.
 
-* ``-t`` or ``--trunk-only``: This flag is unset by default, which 
-  means the documentation is built for the current development trunk 
-  as well as all version tags from the version tags folder for your 
-  package in :term:`Subversion`. If you set this flag only documentation 
-  from the development trunk will be built.
+* ``-t`` or ``--trunk-only``: This flag is unset by default. If you set
+  this flag only documentation from the main development branch will be built.
 
 * ``-m`` or ``--max-tags``: When building documentation for the
   current development version and all tags this flag specifies how many
   tags to show on the main index page. If more tags exist, a link to a
   separate page is inserted that shows all tags for the given package.
   The default value is 5.
-
-* ``-n`` or ``--no-packages``: Do not check out and include
-  documentation for any software package. This option will re-use
-  any ``index.rst`` already in place (or copy the template to
-  ``index.rst``) and then just build ``index.rst`` and whatever else
-  is refers to from its enclosing folder. This option speeds up
-  documentation builds when you are only changing non-package
-  documents.
 
 * ``-v`` or ``--verbose``: Set the log verbosity. If ``--v`` is 
   specified you will see more detailed logging output. If you 
@@ -105,31 +92,10 @@ which you can discover yourself by running ``docbuilder -h`` or
   compile it to the final ``<NAME>.html`` output. The default value
   is ``index``.
 
-* ``--fallback-css=<PATH>``: Optional path to a CSS file used for
-  styling converted ReST output generated from the `Setuptools`
-  ``long_description`` package option. The ``long_description`` value 
-  is used as a fallback if no full Sphinx documentation can be found.
-
 * ``--docs-directory=<NAME>``: The folder name inside your software 
   package checkout where `Sphinx` documentation is stored. By 
   default, the folders `doc` and `docs` are searched. You can use this 
   parameter multiple times to add other folder names to the default list.
-
-* ``--trunk-directory=<NAME>``: The folder name inside your package's 
-  revision control location where the most current development happens.
-  By default a name of `trunk` is used. This parameter is only relevant 
-  for :term:`Subversion` repositories.
-
-* ``--tags-directory=<NAME>``: The folder name inside your package's 
-  revision control location where version tags are stored. By default
-  a name of `tags` is used. This parameter is only relevant for 
-  :term:`Subversion` repositories.
-
-* ``--z3csphinx-output-directory=<PATH>``: If you generate some 
-  documentation via :mod:`z3c.recipe.sphinxdoc` and want to stitch 
-  links to it into the generated index file, you can provide the 
-  path to the :mod:`z3c.recipe.sphinxdoc` root folder for its 
-  generated docs here.
 
 * ``-h`` or ``--help``: Show the help text.
 
@@ -190,14 +156,4 @@ above):
 
 * ``index-name``: The ``--index-name`` parameter shown above
 
-* ``fallback-css``: The ``--fallback-css`` parameter shown above
-
 * ``docs-directory``: The ``--docs-directory`` parameter shown above
-
-* ``trunk-directory``: The ``--trunk-directory`` parameter shown above
-
-* ``tags-directory``: The ``--tags-directory`` parameter shown above
-
-* ``z3csphinx-output-directory``: The ``--z3csphinx-output-directory``
-  parameter shown above.
-

@@ -17,7 +17,7 @@ import os
 import subprocess
 
 
-def shell_cmd(cmd, fromwhere=None):
+def shell_cmd(cmd, fromwhere=None, quiet=False):
     cwd = os.getcwd()
     if fromwhere:
         os.chdir(fromwhere)
@@ -33,4 +33,6 @@ def shell_cmd(cmd, fromwhere=None):
         output = output.decode('UTF-8')
 
     os.chdir(cwd)
-    return output
+
+    if output and not quiet:
+        return output

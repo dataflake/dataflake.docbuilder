@@ -39,3 +39,10 @@ additional-rules = [
 additional-ignores = [
     "docs/_build/html/_static/*",
     ]
+
+[git]
+ignore = [
+    "src/dataflake/docbuilder/index_template/_build/",
+    "src/dataflake/docbuilder/index_template/dataflake.docbuilder.rst",
+    "src/dataflake/docbuilder/index_template/index.rst",
+    ]

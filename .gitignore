@@ -30,3 +30,6 @@ parts/
 pyvenv.cfg
 testing.log
 var/
+src/dataflake/docbuilder/index_template/_build/
+src/dataflake/docbuilder/index_template/dataflake.docbuilder.rst
+src/dataflake/docbuilder/index_template/index.rst

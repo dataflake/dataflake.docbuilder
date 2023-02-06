@@ -40,16 +40,9 @@ class BuildoutScript:
         if not options.get('sources'):
             options['sources'] = ''
 
-        if not options.get('sources') and \
-           not options.get('z3csphinx-output-directory') and \
-           not options.get('no-packages'):
+        if not options.get('sources'):
             msg = 'Missing parameter: source (Version control URLs).'
             raise zc.buildout.UserError(msg)
-
-        z3csphinx_doc_root = options.get('z3csphinx-output-directory')
-        if z3csphinx_doc_root and not os.path.isdir(z3csphinx_doc_root):
-            msg = 'z3c.recipe.sphinxdoc output folder %s does not exist'
-            raise zc.buildout.UserError(msg % z3csphinx_doc_root)
 
         if not options.get('working-directory'):
             parts = buildout['buildout']['parts-directory']
@@ -94,21 +87,10 @@ class BuildoutScript:
             od = self.options['output-directory'].strip()
             script_args.extend(['-o', od])
 
-        if self.options.get('copy-output'):
-            script_args.extend(['-c', self.options['copy-output']])
-
         if self.options.get('docs-directory'):
             df = [x.strip() for x in self.options['docs-directory'].split()]
             for doc_folder in df:
                 script_args.extend(['--docs-directory', doc_folder])
-
-        if self.options.get('trunk-directory'):
-            script_args.extend(['--trunk-directory',
-                                self.options['trunk-directory']])
-
-        if self.options.get('tags-directory'):
-            script_args.extend(['--tags-directory',
-                                self.options['tags-directory']])
 
         if self.options.get('trunk-only'):
             script_args.extend(['-t', self.options['trunk-only']])
@@ -125,22 +107,8 @@ class BuildoutScript:
             index_template = os.path.join(self.sw_path, 'index_template')
         script_args.extend(['--index-template', index_template])
 
-        if self.options.get('no-packages'):
-            script_args.extend(['--no-packages'])
-
         if self.options.get('index-name'):
             script_args.extend(['--index-name', self.options['index-name']])
-
-        if self.options.get('z3csphinx-output-directory'):
-            zod = self.options.get('z3csphinx-output-directory').strip()
-            script_args.extend(['--z3csphinx-output-directory', zod])
-
-        if self.options.get('fallback-css'):
-            fallback_css = self.options['fallback-css']
-        else:
-            template_dir = os.path.join(self.sw_path, 'index_template')
-            fallback_css = os.path.join(template_dir, '_static', 'python.css')
-        script_args.extend(['--fallback-css', fallback_css])
 
         init_code = INITIALIZATION % {'script_arguments': str(script_args)}
 
