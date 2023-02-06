@@ -1,8 +1,10 @@
 Change log
 ==========
 
-2.2 (unreleased)
+2.2 (2023-02-06)
 ----------------
+
+- Fix breakage attempting to activate invalid distributions
 
 
 2.1 (2022-02-06)
