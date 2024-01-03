@@ -23,7 +23,7 @@ def read(*rnames):
 
 
 setup(name='dataflake.docbuilder',
-      version='2.4.dev0',
+      version='2.4',
       description='Automated Sphinx documentation builder',
       long_description=read('README.rst'),
       classifiers=[
@@ -37,6 +37,7 @@ setup(name='dataflake.docbuilder',
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries :: Python Modules",
