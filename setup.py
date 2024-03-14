@@ -13,7 +13,6 @@
 
 import os
 
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -53,9 +52,8 @@ setup(name='dataflake.docbuilder',
                           'dataflake.docbuilder/issues'),
       },
       license="ZPL 2.1",
-      packages=find_packages('src'),
+      packages=['dataflake.docbuilder'],
       package_dir={'': 'src'},
-      namespace_packages=['dataflake'],
       include_package_data=True,
       python_requires='>=3.7',
       install_requires=[
